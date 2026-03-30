@@ -1,8 +1,12 @@
 ---
 layout: default
-title: 내 블로그 메인
+title: Including
 ---
 
-# 안녕하세요! 👋
-
-프론트엔드 개발자 **funetes**의 기술 블로그입니다.
+<ul>
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ post.url | relative_url }}">{{ post.date | date: "%Y-%m-%d" }} - {{ post.title }}</a>
+    </li>
+  {% endfor %}
+</ul>
