@@ -1,7 +1,8 @@
 ---
 layout: default
-title: Including
 ---
+
+# 포스트 목록
 
 <ul>
   {% for post in site.posts %}
