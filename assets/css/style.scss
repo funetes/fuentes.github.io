@@ -8,7 +8,6 @@
   flex-direction: row; /* 좌측 TOC, 우측 본문 */
   gap: 40px;
   align-items: flex-start;
-  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -25,6 +24,7 @@
 
 /* 본문 스타일 */
 .js-toc-content {
+  max-width: 1200px;
   flex: 1;
   min-width: 0; /* Flexbox 내에서 텍스트 넘침 방지 */
 }
