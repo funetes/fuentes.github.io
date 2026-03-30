@@ -4,44 +4,58 @@ title: "GitHub 블로그 시작하기"
 date: 2026-03-29 12:00:00 +0900
 ---
 
-# 첫 포스트입니다!
+Whether you're drafting a README, organizing notes, or just want to see what I can do with formatting, here is a comprehensive sample of Markdown.
 
-Cayman 테마를 적용해서 블로그를 만들었습니다.
+---
 
-### 오늘 배운 것
+## 1. Text Formatting
 
-1. GitHub Actions로 배포하기
-2. 레포지토리 이름 맞추기
-3. Jekyll 포스트 규칙
+It’s easy to add emphasis to your words:
 
-Cayman 테마를 적용해서 블로그를 만들었습니다.
+- **Bold text** for strong emphasis.
+- _Italic text_ for a subtle touch.
+- ~~Strikethrough~~ for things that are no longer relevant.
+- `Inline code` for variables or file names.
 
-### 오늘 배운 것
+## 2. Lists & Organization
 
-1. GitHub Actions로 배포하기
-2. 레포지토리 이름 맞추기
-3. Jekyll 포스트 규칙
+### Shopping List (Unordered)
 
-Cayman 테마를 적용해서 블로그를 만들었습니다.
+- Espresso beans
+- Oat milk
+- Dark chocolate
 
-### 오늘 배운 것
+### To-Do List (Ordered)
 
-1. GitHub Actions로 배포하기
-2. 레포지토리 이름 맞추기
-3. Jekyll 포스트 규칙
+1.  Finish the project proposal.
+2.  Walk the dog.
+3.  Conquer the world (optional).
 
-Cayman 테마를 적용해서 블로그를 만들었습니다.
+## 3. Blockquotes & Notes
 
-### 오늘 배운 것
+> "The secret of getting ahead is getting started."
+> — _Mark Twain_
 
-1. GitHub Actions로 배포하기
-2. 레포지토리 이름 맞추기
-3. Jekyll 포스트 규칙
+## 4. Tables
 
-Cayman 테마를 적용해서 블로그를 만들었습니다.
+Use tables to keep data crisp and comparable:
 
-### 오늘 배운 것
+| Feature    | Markdown       | Result                       |
+| :--------- | :------------- | :--------------------------- |
+| **Links**  | `[Title](URL)` | [Google](https://google.com) |
+| **Images** | `![Alt](URL)`  | An embedded image            |
+| **Bold**   | `**Text**`     | **Text**                     |
 
-1. GitHub Actions로 배포하기
-2. 레포지토리 이름 맞추기
-3. Jekyll 포스트 규칙
+## 5. Mathematical Notation
+
+For technical work, I use LaTeX. For example, the area of a circle is calculated as:
+
+$$A = \pi r^2$$
+
+And the solution to a quadratic equation $ax^2 + bx + c = 0$ is:
+
+$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+
+---
+
+**Would you like me to convert a specific document of yours into this Markdown format?**
