@@ -4,10 +4,15 @@ layout: default
 
 <small>{{ page.date | date: "%Y-%m-%d" }}</small>
 
-<div class="wrapper">
-  <aside class="js-toc toc-sticky"></aside>
+<div class="post-wrapper">
+  <aside class="toc-sidebar js-toc"></aside>
 
-  <article class="js-toc-content">{{ content }}</article>
+  <article class="js-toc-content">
+    <h1>{{ page.title }}</h1>
+    <p style="color: #666">{{ page.date | date: "%Y-%m-%d" }}</p>
+    <hr />
+    {{ content }}
+  </article>
 </div>
 
 <a href="{{ site.baseurl }}/">← 메인으로</a>

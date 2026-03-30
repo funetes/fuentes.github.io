@@ -1,5 +1,5 @@
 ---
-layout: my-post
+layout: post
 title: "GitHub 블로그 시작하기"
 date: 2026-03-29 12:00:00 +0900
 ---
