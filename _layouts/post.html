@@ -2,25 +2,21 @@
 layout: default
 ---
 
-<small>{{ page.date | date: "%Y-%m-%d" }}</small>
-<h1>{{ page.title }}</h1>
-
-{{ content }}
-
-<hr />
-<a href="{{ site.baseurl }}/">← 메인으로</a>
-
 <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.27.0/tocbot.css"
 />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.27.0/tocbot.min.js"></script>
 
+<small>{{ page.date | date: "%Y-%m-%d" }}</small>
+
 <div class="wrapper">
   <aside class="js-toc toc-sticky"></aside>
 
   <article class="js-toc-content">{{ content }}</article>
 </div>
+
+<a href="{{ site.baseurl }}/">← 메인으로</a>
 
 <script>
   tocbot.init({

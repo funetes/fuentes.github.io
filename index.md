@@ -2,8 +2,6 @@
 layout: default
 ---
 
-# 포스트 목록
-
 <ul>
   {% for post in site.posts %}
     <li>
