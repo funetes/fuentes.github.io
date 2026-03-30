@@ -5,16 +5,14 @@ layout: default
 <small>{{ page.date | date: "%Y-%m-%d" }}</small>
 
 <div class="post-wrapper">
-  <aside class="toc-sidebar js-toc"></aside>
-
-  <article class="js-toc-content">
+  <aside class="toc-sidebar js-toc">
     <h1>{{ page.title }}</h1>
     <p style="color: #666">{{ page.date | date: "%Y-%m-%d" }}</p>
     <hr />
-    <!-- {{ content }} -->
-  </article>
-</div>
+  </aside>
 
+  <article class="js-toc-content">{{ content }}</article>
+</div>
 <a href="{{ site.baseurl }}/">← 메인으로</a>
 
 <link
