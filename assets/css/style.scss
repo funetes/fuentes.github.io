@@ -1,0 +1,32 @@
+/* PC 화면 기준 레이아웃 */
+@media (min-width: 1024px) {
+  .post-container {
+    display: flex;
+    flex-direction: row-reverse; /* TOC를 오른쪽에 두기 위함 */
+    align-items: flex-start;
+    gap: 30px;
+  }
+
+  .post-toc {
+    position: sticky;
+    top: 20px;
+    width: 250px;
+    min-width: 250px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-left: 3px solid #159957; /* Cayman 테마 메인 색상 */
+    font-size: 0.9rem;
+  }
+
+  .post-content {
+    flex: 1;
+    max-width: calc(100% - 280px);
+  }
+}
+
+/* 목차 리스트 스타일 제거 */
+.post-toc ul {
+  list-style: none;
+  padding-left: 15px;
+  margin: 0;
+}
