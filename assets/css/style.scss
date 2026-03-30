@@ -3,6 +3,11 @@
 
 @import "{{ site.theme }}";
 
+.main-content {
+  max-width: 1400px !important; /* 또는 1400px 등 원하는 너비 */
+  margin: 0 auto;
+}
+
 .post-wrapper {
   display: flex;
   flex-direction: row; /* 좌측 TOC, 우측 본문 */
