@@ -4,7 +4,6 @@
 @import "{{ site.theme }}";
 
 .post-wrapper {
-  color: red;
   display: flex;
   flex-direction: row; /* 좌측 TOC, 우측 본문 */
   gap: 40px;
@@ -22,14 +21,12 @@
   max-height: calc(100vh - 80px);
   overflow-y: auto;
   font-size: 0.9rem;
-  order: 1; /* 왼쪽 배치 */
 }
 
 /* 본문 스타일 */
 .js-toc-content {
   flex: 1;
   min-width: 0; /* Flexbox 내에서 텍스트 넘침 방지 */
-  order: 2;
 }
 
 /* Tocbot 커스텀 디자인 (Cayman 테마 색상 적용) */
