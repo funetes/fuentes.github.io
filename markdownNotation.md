@@ -1,9 +1,3 @@
----
-layout: post
-title: "GitHub 블로그 시작하기"
-date: 2026-03-29 12:00:00 +0900
----
-
 Whether you're drafting a README, organizing notes, or just want to see what I can do with formatting, here is a comprehensive sample of Markdown.
 
 ---

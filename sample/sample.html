@@ -1,0 +1,129 @@
+<svg
+  width="300"
+  height="300"
+  viewBox="-120 -120 240 240"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <line x1="-110" y1="0" x2="110" y2="0" stroke="#ccc" stroke-width="1" />
+  <line x1="0" y1="-110" x2="0" y2="110" stroke="#ccc" stroke-width="1" />
+
+  <circle cx="0" cy="0" r="100" stroke="blue" stroke-width="2" fill="none" />
+
+  <line x1="0" y1="0" x2="70.7" y2="-70.7" stroke="green" stroke-width="2" />
+
+  <line
+    x1="70.7"
+    y1="0"
+    x2="70.7"
+    y2="-70.7"
+    stroke="green"
+    stroke-dasharray="4"
+  />
+  <text x="35" y="15" font-size="12" fill="black">cos θ</text>
+  <text x="75" y="-35" font-size="12" fill="black">sin θ</text>
+  <text x="20" y="-40" font-size="12" fill="green">1</text>
+
+  <text x="105" y="15" font-size="12">x</text>
+  <text x="5" y="-105" font-size="12">y</text>
+</svg>
+
+<!-- 2코사인법칙 -->
+
+<svg
+  width="400"
+  height="250"
+  viewBox="0 0 400 250"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M 50,200 L 350,200 L 120,50 Z"
+    fill="none"
+    stroke="black"
+    stroke-width="2"
+  />
+
+  <path
+    d="M 80,200 A 30,30 0 0 0 63,175"
+    fill="none"
+    stroke="red"
+    stroke-width="2"
+  />
+  <text x="80" y="190" font-size="16" fill="red">C</text>
+
+  <text x="200" y="220" font-size="16">a</text>
+  <text x="70" y="120" font-size="16">b</text>
+  <text x="240" y="120" font-size="16">c</text>
+  <line x1="120" y1="50" x2="120" y2="200" stroke="blue" stroke-dasharray="4" />
+  <text x="125" y="130" font-size="14" fill="blue">h = b sin C</text>
+
+  <text x="50" y="30" font-size="14" font-weight="bold">
+    c² = a² + b² - 2ab cos C
+  </text>
+</svg>
+
+<svg
+  width="400"
+  height="250"
+  viewBox="0 0 400 250"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <line x1="20" y1="200" x2="380" y2="200" stroke="#eee" stroke-width="1" />
+
+  <line
+    x1="50"
+    y1="200"
+    x2="350"
+    y2="200"
+    stroke="blue"
+    stroke-width="3"
+    marker-end="url(#arrow-blue)"
+  />
+  <text x="355" y="205" font-size="16" fill="blue" font-weight="bold">b</text>
+
+  <line
+    x1="50"
+    y1="200"
+    x2="250"
+    y2="80"
+    stroke="red"
+    stroke-width="3"
+    marker-end="url(#arrow-red)"
+  />
+  <text x="255" y="75" font-size="16" fill="red" font-weight="bold">a</text>
+
+  <path
+    d="M 90,200 A 40,40 0 0 0 83,180"
+    fill="none"
+    stroke="black"
+    stroke-width="1.5"
+  />
+  <text x="100" y="190" font-size="14">θ</text>
+
+  <line x1="250" y1="80" x2="250" y2="200" stroke="gray" stroke-dasharray="4" />
+
+  <line x1="50" y1="210" x2="250" y2="210" stroke="green" stroke-width="2" />
+  <text x="100" y="230" font-size="13" fill="green">|a| cos θ</text>
+
+  <defs>
+    <marker
+      id="arrow-blue"
+      markerWidth="10"
+      markerHeight="10"
+      refX="9"
+      refY="3"
+      orient="auto"
+    >
+      <path d="M0,0 L0,6 L9,3 z" fill="blue" />
+    </marker>
+    <marker
+      id="arrow-red"
+      markerWidth="10"
+      markerHeight="10"
+      refX="9"
+      refY="3"
+      orient="auto"
+    >
+      <path d="M0,0 L0,6 L9,3 z" fill="red" />
+    </marker>
+  </defs>
+</svg>
