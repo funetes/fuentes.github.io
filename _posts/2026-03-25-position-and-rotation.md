@@ -14,7 +14,7 @@ date: 2026-03-25 12:00:00 +0900
 
 어떤 점의 위치는 해당 좌표계의 각 축을 따라 측정된 거리의 조합으로 나타낼 수 있습니다. 이 거리는 곧 **위치 벡터를 대응하는 각 좌표축(단위 벡터)에 투영(Projection)했을 때의 길이**를 의미합니다.
 
-![alt text](image.png)
+![alt text](/assets/images/image.png)
 
 이를 수학적으로 표현하면, 위치 벡터 ${^A\underline{p}}$는 다음과 같이 각 축의 단위 벡터 $\hat{\underline{X}}_A, \hat{\underline{Y}}_A, \hat{\underline{Z}}_A$와의 투영(Projection)으로 나타낼 수 있습니다.
 
@@ -70,6 +70,6 @@ $${^A\underline{p}} = {^A_BR} \cdot {^B\underline{p}}$$
 
 이러한 매핑 과정을 이미지로 나타내면 아래와 같습니다.
 
-![alt text](image-1.png)
+![alt text](/assets/images/image-1.png)
 
 결론적으로, 위 수식은 **회전된 로컬 좌표계 $\{B\}$에서 정의된 점의 위치($^B\underline{p}$)를 회전 행렬($^A_BR$)을 통해 매핑하여, 글로벌 기준 좌표계 $\{A\}$에서의 위치($^A\underline{p}$)로 변환해 내는 과정**을 의미합니다.
