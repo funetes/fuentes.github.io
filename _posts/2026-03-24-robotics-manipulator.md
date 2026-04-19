@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Robot Manipulator"
-date: 2026-04-19 12:00:00 +0900
+date: 2026-03-24 12:00:00 +0900
 ---
 
 # Robot Manipulator
