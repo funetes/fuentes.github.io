@@ -48,4 +48,8 @@ $$
 
 회전 행렬은 **직교 행렬(Orthogonal Matrix)**의 성질을 가지므로, 역행렬은 전치 행렬과 같습니다.
 
+## 인터랙티브 시각화
+
+<iframe src="/sample/rotation.html" style="width:100%; height:800px; border:none; margin-top:20px;"></iframe>
+
 $${}^B_A R = {}^A_B R^T = {}^A_B R^{-1}$$
