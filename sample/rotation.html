@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>X축 회전 변환 (Rotation about X-axis)</title>
+    <title>3D 회전 변환 (X, Y, Z Axis Rotations)</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,6 +32,7 @@
         border-right: 2px solid #333;
         border-radius: 4px;
         padding: 0 4px;
+        background: white;
       }
       .matrix-col {
         display: flex;
@@ -64,13 +65,28 @@
       .label-p {
         color: #ea580c;
       } /* Orange-600 */
+
+      /* Custom Scrollbar for Panel */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
     </style>
   </head>
   <body class="flex flex-col md:flex-row h-screen">
     <!-- 3D Canvas Container -->
     <div
       id="canvas-container"
-      class="relative w-full md:w-3/5 lg:w-2/3 h-1/2 md:h-full bg-slate-50 cursor-grab active:cursor-grabbing"
+      class="relative w-full md:w-3/5 lg:w-2/3 h-[55%] md:h-full bg-slate-50 cursor-grab active:cursor-grabbing"
     >
       <!-- Labels (Injected via JS) -->
       <div id="label-xa" class="label label-a math">X̂<sub>A</sub></div>
@@ -98,37 +114,79 @@
         </div>
         <div class="flex items-center gap-2">
           <div class="w-3 h-3 rounded-full bg-orange-500"></div>
-          점 P (회전 좌표계 상의 한 점)
+          점 P
         </div>
         <p class="text-xs text-gray-500 mt-2">
-          💡 마우스로 화면을 드래그하여 시점을 회전할 수 있습니다.
+          💡 화면 드래그: 시점 회전 | 스크롤: 줌
         </p>
       </div>
     </div>
 
     <!-- UI Panel -->
     <div
-      class="w-full md:w-2/5 lg:w-1/3 h-1/2 md:h-full bg-white shadow-[-4px_0_15px_rgba(0,0,0,0.05)] z-10 flex flex-col overflow-y-auto"
+      class="w-full md:w-2/5 lg:w-1/3 h-[45%] md:h-full bg-white shadow-[-4px_0_15px_rgba(0,0,0,0.05)] z-10 flex flex-col overflow-y-auto"
     >
-      <div class="p-6 border-b border-gray-100">
-        <h1 class="text-2xl font-bold text-slate-800">
-          4. Rotation (x축 회전)
+      <div
+        class="p-5 border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur z-20"
+      >
+        <h1 id="main-title" class="text-2xl font-bold text-slate-800">
+          Rotation (x축 회전)
         </h1>
-        <p class="text-slate-500 text-sm mt-1">
-          Mapping for rotation about X<sub>A</sub> axis by
-          <span class="math text-lg">θ</span>
+        <p id="sub-title" class="text-slate-500 text-sm mt-1 mb-4">
+          Mapping for rotation about X<sub>A</sub> axis
         </p>
+
+        <!-- Axis Selection Tabs -->
+        <div class="flex bg-slate-100 p-1 rounded-lg text-sm mb-4">
+          <button
+            id="tab-x"
+            class="flex-1 py-2 px-2 rounded-md bg-white shadow font-bold text-blue-600 transition-all"
+            onclick="setAxis('x')"
+          >
+            X축 회전
+          </button>
+          <button
+            id="tab-y"
+            class="flex-1 py-2 px-2 rounded-md text-gray-500 font-semibold hover:text-gray-800 transition-all"
+            onclick="setAxis('y')"
+          >
+            Y축 회전
+          </button>
+          <button
+            id="tab-z"
+            class="flex-1 py-2 px-2 rounded-md text-gray-500 font-semibold hover:text-gray-800 transition-all"
+            onclick="setAxis('z')"
+          >
+            Z축 회전
+          </button>
+        </div>
+
+        <!-- 관점 토글 버튼 -->
+        <div class="bg-slate-100 p-1 rounded-lg flex text-xs text-center">
+          <button
+            id="btn-mode-b"
+            class="flex-1 py-1 px-1 rounded-md bg-white shadow font-semibold text-blue-600 transition-all"
+          >
+            점 P를 Frame B에 고정
+          </button>
+          <button
+            id="btn-mode-a"
+            class="flex-1 py-1 px-1 rounded-md text-gray-500 hover:text-gray-700 transition-all"
+          >
+            점 P를 우주공간에 고정
+          </button>
+        </div>
       </div>
 
-      <div class="p-6 flex-1 space-y-8">
+      <div class="p-5 flex-1 space-y-6">
         <!-- Control -->
-        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
           <div class="flex justify-between items-end mb-4">
             <label class="font-semibold text-slate-700"
               >회전 각도 (<span class="math">θ</span>)</label
             >
             <div class="text-2xl font-bold text-blue-600">
-              <span id="val-degree">0</span>°
+              <span id="val-degree">45</span>°
             </div>
           </div>
           <input
@@ -143,104 +201,45 @@
 
         <!-- Equations -->
         <div>
-          <h3 class="font-semibold text-slate-700 mb-3 border-b pb-2">
+          <h3 class="font-semibold text-slate-700 mb-2 border-b pb-1 text-sm">
             방정식 (Equations)
           </h3>
-          <div class="text-lg space-y-2 math pl-4">
-            <p>x<sub>A</sub> = x<sub>B</sub></p>
-            <p>
-              y<sub>A</sub> = y<sub>B</sub>
-              <span class="font-bold text-blue-600"
-                >cos <span class="val-degree-txt">45</span>°</span
-              >
-              - z<sub>B</sub>
-              <span class="font-bold text-red-600"
-                >sin <span class="val-degree-txt">45</span>°</span
-              >
-            </p>
-            <p>
-              z<sub>A</sub> = y<sub>B</sub>
-              <span class="font-bold text-red-600"
-                >sin <span class="val-degree-txt">45</span>°</span
-              >
-              + z<sub>B</sub>
-              <span class="font-bold text-blue-600"
-                >cos <span class="val-degree-txt">45</span>°</span
-              >
-            </p>
+          <div id="equations-container" class="text-base space-y-1 math pl-4">
+            <!-- Injected via JS -->
           </div>
         </div>
 
         <!-- Matrix -->
         <div>
-          <h3 class="font-semibold text-slate-700 mb-3 border-b pb-2">
+          <h3 class="font-semibold text-slate-700 mb-2 border-b pb-1 text-sm">
             동차 변환 행렬 (Homogeneous Matrix)
           </h3>
           <div
-            class="flex items-center justify-center space-x-2 text-md math overflow-x-auto py-2"
+            id="matrix-container"
+            class="flex items-center justify-center space-x-1 text-sm math py-2 overflow-x-auto"
           >
-            <!-- Result Vector -->
-            <div class="matrix-bracket">
-              <div class="matrix-col">
-                <span>x<sub>A</sub></span
-                ><span>y<sub>A</sub></span
-                ><span>z<sub>A</sub></span
-                ><span>1</span>
-              </div>
-            </div>
-            <span class="font-sans font-bold text-gray-400">=</span>
-            <!-- 4x4 Matrix -->
-            <div class="matrix-bracket bg-blue-50/50">
-              <div class="matrix-col font-sans font-medium">
-                <span>1.00</span><span>0.00</span><span>0.00</span
-                ><span>0</span>
-              </div>
-              <div class="matrix-col font-sans font-medium text-blue-700">
-                <span class="text-gray-400">0.00</span><span id="m11">0.71</span
-                ><span id="m21">0.71</span><span class="text-gray-400">0</span>
-              </div>
-              <div class="matrix-col font-sans font-medium text-red-600">
-                <span class="text-gray-400">0.00</span
-                ><span id="m12">-0.71</span><span id="m22">0.71</span
-                ><span class="text-gray-400">0</span>
-              </div>
-              <div class="matrix-col font-sans font-medium">
-                <span>0.00</span><span>0.00</span><span>0.00</span
-                ><span>1</span>
-              </div>
-            </div>
-            <!-- Input Vector -->
-            <div class="matrix-bracket">
-              <div class="matrix-col">
-                <span>x<sub>B</sub></span
-                ><span>y<sub>B</sub></span
-                ><span>z<sub>B</sub></span
-                ><span>1</span>
-              </div>
-            </div>
+            <!-- Injected via JS -->
           </div>
         </div>
 
         <!-- Real-time Example -->
-        <div class="bg-orange-50 border border-orange-200 p-4 rounded-xl">
-          <h3 class="font-semibold text-orange-800 mb-2">
-            점 P의 좌표 변환 예시
+        <div
+          id="example-box"
+          class="bg-orange-50 border border-orange-200 p-4 rounded-xl transition-colors"
+        >
+          <h3
+            id="example-title"
+            class="font-semibold text-orange-800 mb-2 text-sm"
+          >
+            점 P의 좌표 변환 예시 (Frame B에 고정)
           </h3>
           <div class="flex justify-between items-center text-sm math">
-            <div>
-              <p class="text-gray-500 mb-1">Frame B 기준 (고정)</p>
-              <p class="text-lg font-bold">
-                P<sub>B</sub> = [ 0.0, <span class="text-blue-600">4.0</span>,
-                <span class="text-blue-600">3.0</span> ]
-              </p>
+            <div id="example-left">
+              <!-- Injected via JS -->
             </div>
-            <div class="text-2xl text-orange-300 font-sans">➔</div>
-            <div class="text-right">
-              <p class="text-gray-500 mb-1">Frame A 기준 (계산됨)</p>
-              <p class="text-lg font-bold text-orange-600">
-                P<sub>A</sub> = [ 0.0, <span id="pa-y">0.7</span>,
-                <span id="pa-z">5.0</span> ]
-              </p>
+            <div class="text-xl text-orange-300 font-sans mx-2">➔</div>
+            <div id="example-right" class="text-right">
+              <!-- Injected via JS -->
             </div>
           </div>
         </div>
@@ -248,35 +247,50 @@
     </div>
 
     <script>
-      /** * 수학적 모델과 Three.js 렌더링 축 매핑
-       * 이미지의 수식은 X축 회전을 나타냄. 직관적인 시각화를 위해
-       * Three.js의 Z축을 화면 밖으로 나오는 X축으로 취급합니다.
-       * 매핑: Diagram X = Three.js Z / Diagram Y = Three.js X / Diagram Z = Three.js Y
-       */
+      // --- 수학/좌표계 매핑 헬퍼 ---
+      // Diagram(수학 모델) 좌표계와 Three.js 좌표계 매핑
+      // Right-Handed Rule 일치시키기: Diagram X = Three Z, Diagram Y = Three X, Diagram Z = Three Y
+      function toThree(diagPos) {
+        return new THREE.Vector3(diagPos.y, diagPos.z, diagPos.x);
+      }
+      function toDiag(threePos) {
+        return new THREE.Vector3(threePos.z, threePos.x, threePos.y);
+      }
+
+      // --- 상태 변수 ---
+      let currentAxis = "x"; // 'x', 'y', 'z'
+      let isPointFixedToB = true;
+      // P점의 초기 위치 (Diagram 좌표 기준)
+      const initP_Diag = new THREE.Vector3(2, 4, 3);
+      const pB_local_three = toThree(initP_Diag);
 
       // --- DOM 요소 ---
       const slider = document.getElementById("theta-slider");
       const degDisplay = document.getElementById("val-degree");
-      const degTexts = document.querySelectorAll(".val-degree-txt");
-      const m11 = document.getElementById("m11");
-      const m12 = document.getElementById("m12");
-      const m21 = document.getElementById("m21");
-      const m22 = document.getElementById("m22");
-      const paY = document.getElementById("pa-y");
-      const paZ = document.getElementById("pa-z");
+      const mainTitle = document.getElementById("main-title");
+      const subTitle = document.getElementById("sub-title");
+      const eqContainer = document.getElementById("equations-container");
+      const matContainer = document.getElementById("matrix-container");
+      const exampleLeft = document.getElementById("example-left");
+      const exampleRight = document.getElementById("example-right");
+
+      const tabs = {
+        x: document.getElementById("tab-x"),
+        y: document.getElementById("tab-y"),
+        z: document.getElementById("tab-z"),
+      };
 
       // --- Three.js 초기화 ---
       const container = document.getElementById("canvas-container");
       const scene = new THREE.Scene();
 
-      // 카메라 설정 (Diagram의 X축이 화면을 향하도록 시점 조정)
       const camera = new THREE.PerspectiveCamera(
         45,
         container.clientWidth / container.clientHeight,
         0.1,
         1000,
       );
-      camera.position.set(10, 6, 12);
+      camera.position.set(12, 8, 14);
 
       const renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -290,7 +304,6 @@
       controls.enableDamping = true;
       controls.target.set(0, 2, 0);
 
-      // 조명 추가
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
       scene.add(ambientLight);
       const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -299,8 +312,6 @@
 
       // --- 객체 생성 ---
       const ARROW_LEN = 6;
-
-      // 화살표 생성 헬퍼
       function createAxis(dir, color) {
         return new THREE.ArrowHelper(
           dir,
@@ -314,58 +325,50 @@
 
       // Frame A (World Frame - 검정/회색)
       const frameA = new THREE.Group();
-      const axY_A = createAxis(new THREE.Vector3(1, 0, 0), 0x333333); // Three.js X -> Diagram Y
-      const axZ_A = createAxis(new THREE.Vector3(0, 1, 0), 0x333333); // Three.js Y -> Diagram Z
-      const axX_A = createAxis(new THREE.Vector3(0, 0, 1), 0x333333); // Three.js Z -> Diagram X
-      frameA.add(axY_A, axZ_A, axX_A);
+      frameA.add(createAxis(new THREE.Vector3(1, 0, 0), 0x333333)); // Three X (Diag Y)
+      frameA.add(createAxis(new THREE.Vector3(0, 1, 0), 0x333333)); // Three Y (Diag Z)
+      frameA.add(createAxis(new THREE.Vector3(0, 0, 1), 0x333333)); // Three Z (Diag X)
       scene.add(frameA);
 
       // Frame B (Rotated Frame - 파란색)
       const frameB = new THREE.Group();
-      const axY_B = createAxis(new THREE.Vector3(1, 0, 0), 0x2563eb);
-      const axZ_B = createAxis(new THREE.Vector3(0, 1, 0), 0x2563eb);
-      const axX_B = createAxis(new THREE.Vector3(0, 0, 1), 0x2563eb);
-      frameB.add(axY_B, axZ_B, axX_B);
+      frameB.add(createAxis(new THREE.Vector3(1, 0, 0), 0x2563eb));
+      frameB.add(createAxis(new THREE.Vector3(0, 1, 0), 0x2563eb));
+      frameB.add(createAxis(new THREE.Vector3(0, 0, 1), 0x2563eb));
       scene.add(frameB);
 
-      // 점 P (Frame B에 소속)
-      // Diagram 상에서 y=4, z=3, x=0 위치
-      const pointGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-      const pointMaterial = new THREE.MeshPhongMaterial({ color: 0xea580c });
-      const pointMesh = new THREE.Mesh(pointGeometry, pointMaterial);
+      // 점 P
+      const pointMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.25, 16, 16),
+        new THREE.MeshPhongMaterial({ color: 0xea580c }),
+      );
+      pointMesh.position.copy(pB_local_three);
+      frameB.add(pointMesh); // 초기 모드 B
 
-      const pB_local = new THREE.Vector3(4, 3, 0); // Three.js 좌표계 (X=4, Y=3, Z=0)
-      pointMesh.position.copy(pB_local);
-      frameB.add(pointMesh);
-
-      // 투영선 (Dashed Lines)
-      const lineMaterialB = new THREE.LineDashedMaterial({
+      // 투영선
+      const lineMatB = new THREE.LineDashedMaterial({
         color: 0x2563eb,
         dashSize: 0.2,
         gapSize: 0.1,
       });
-      const lineMaterialA = new THREE.LineDashedMaterial({
+      const lineMatA = new THREE.LineDashedMaterial({
         color: 0x9ca3af,
         dashSize: 0.2,
         gapSize: 0.1,
       });
 
       const lines = {
-        b_y: new THREE.Line(new THREE.BufferGeometry(), lineMaterialB),
-        b_z: new THREE.Line(new THREE.BufferGeometry(), lineMaterialB),
-        a_y: new THREE.Line(new THREE.BufferGeometry(), lineMaterialA),
-        a_z: new THREE.Line(new THREE.BufferGeometry(), lineMaterialA),
+        b1: new THREE.Line(new THREE.BufferGeometry(), lineMatB),
+        b2: new THREE.Line(new THREE.BufferGeometry(), lineMatB),
+        a1: new THREE.Line(new THREE.BufferGeometry(), lineMatA),
+        a2: new THREE.Line(new THREE.BufferGeometry(), lineMatA),
       };
+      frameB.add(lines.b1, lines.b2);
+      scene.add(lines.a1, lines.a2);
 
-      frameB.add(lines.b_y);
-      frameB.add(lines.b_z);
-      scene.add(lines.a_y);
-      scene.add(lines.a_z);
-
-      // 회전 각도 표시용 Arc (호)
       let arcMesh = null;
 
-      // --- 라벨 시스템 ---
+      // 라벨
       const labels = {
         ya: {
           el: document.getElementById("label-ya"),
@@ -399,7 +402,7 @@
         },
         p: {
           el: document.getElementById("label-p"),
-          pos: pB_local.clone().add(new THREE.Vector3(0.3, 0.3, 0)),
+          pos: new THREE.Vector3(),
           parent: frameB,
         },
         th: {
@@ -409,134 +412,319 @@
         },
       };
 
+      // --- UI 업데이트 함수들 ---
+      function setAxis(axis) {
+        currentAxis = axis;
+
+        // 탭 스타일 변경
+        for (let key in tabs) {
+          tabs[key].className =
+            "flex-1 py-2 px-2 rounded-md text-gray-500 font-semibold hover:text-gray-800 transition-all";
+        }
+        tabs[axis].className =
+          "flex-1 py-2 px-2 rounded-md bg-white shadow font-bold text-blue-600 transition-all";
+
+        // 타이틀 변경
+        mainTitle.innerText = `Rotation (${axis.toUpperCase()}축 회전)`;
+        subTitle.innerHTML = `Mapping for rotation about ${axis.toUpperCase()}<sub>A</sub> axis`;
+
+        updateScene();
+      }
+
+      function renderMathUI(deg, rad) {
+        const c = Math.cos(rad).toFixed(2);
+        const s = Math.sin(rad).toFixed(2);
+        const ms = (-Math.sin(rad)).toFixed(2);
+
+        const cosSpan = `<span class="font-bold text-blue-600">cos ${deg}°</span>`;
+        const sinSpan = `<span class="font-bold text-red-600">sin ${deg}°</span>`;
+
+        const cVal = `<span class="text-blue-700">${c}</span>`;
+        const sVal = `<span class="text-red-600">${s}</span>`;
+        const msVal = `<span class="text-red-600">${ms}</span>`;
+        const zVal = `<span class="text-gray-400">0.00</span>`;
+
+        let eq, mat;
+
+        if (currentAxis === "x") {
+          eq = `
+                    <p>x<sub>A</sub> = x<sub>B</sub></p>
+                    <p>y<sub>A</sub> = y<sub>B</sub> ${cosSpan} - z<sub>B</sub> ${sinSpan}</p>
+                    <p>z<sub>A</sub> = y<sub>B</sub> ${sinSpan} + z<sub>B</sub> ${cosSpan}</p>
+                `;
+          mat = `
+                    <div class="matrix-col font-sans font-medium"><span>1.00</span><span class="text-gray-400">0.00</span><span class="text-gray-400">0.00</span><span>0</span></div>
+                    <div class="matrix-col font-sans font-medium"><span class="text-gray-400">0.00</span>${cVal}${sVal}<span>0</span></div>
+                    <div class="matrix-col font-sans font-medium"><span class="text-gray-400">0.00</span>${msVal}${cVal}<span>0</span></div>
+                    <div class="matrix-col font-sans font-medium"><span>0.00</span><span>0.00</span><span>0.00</span><span>1</span></div>
+                `;
+        } else if (currentAxis === "y") {
+          eq = `
+                    <p>x<sub>A</sub> = x<sub>B</sub> ${cosSpan} + z<sub>B</sub> ${sinSpan}</p>
+                    <p>y<sub>A</sub> = y<sub>B</sub></p>
+                    <p>z<sub>A</sub> = -x<sub>B</sub> ${sinSpan} + z<sub>B</sub> ${cosSpan}</p>
+                `;
+          mat = `
+                    <div class="matrix-col font-sans font-medium">${cVal}<span class="text-gray-400">0.00</span>${msVal}<span>0</span></div>
+                    <div class="matrix-col font-sans font-medium"><span class="text-gray-400">0.00</span><span>1.00</span><span class="text-gray-400">0.00</span><span>0</span></div>
+                    <div class="matrix-col font-sans font-medium">${sVal}<span class="text-gray-400">0.00</span>${cVal}<span>0</span></div>
+                    <div class="matrix-col font-sans font-medium"><span>0.00</span><span>0.00</span><span>0.00</span><span>1</span></div>
+                `;
+        } else {
+          eq = `
+                    <p>x<sub>A</sub> = x<sub>B</sub> ${cosSpan} - y<sub>B</sub> ${sinSpan}</p>
+                    <p>y<sub>A</sub> = x<sub>B</sub> ${sinSpan} + y<sub>B</sub> ${cosSpan}</p>
+                    <p>z<sub>A</sub> = z<sub>B</sub></p>
+                `;
+          mat = `
+                    <div class="matrix-col font-sans font-medium">${cVal}${sVal}<span class="text-gray-400">0.00</span><span>0</span></div>
+                    <div class="matrix-col font-sans font-medium">${msVal}${cVal}<span class="text-gray-400">0.00</span><span>0</span></div>
+                    <div class="matrix-col font-sans font-medium"><span class="text-gray-400">0.00</span><span class="text-gray-400">0.00</span><span>1.00</span><span>0</span></div>
+                    <div class="matrix-col font-sans font-medium"><span>0.00</span><span>0.00</span><span>0.00</span><span>1</span></div>
+                `;
+        }
+
+        eqContainer.innerHTML = eq;
+
+        // 공통 벡터 구조 감싸기
+        matContainer.innerHTML = `
+                <div class="matrix-bracket"><div class="matrix-col"><span>x<sub>A</sub></span><span>y<sub>A</sub></span><span>z<sub>A</sub></span><span>1</span></div></div>
+                <span class="font-sans font-bold text-gray-400">=</span>
+                <div class="matrix-bracket bg-blue-50/50">${mat}</div>
+                <div class="matrix-bracket"><div class="matrix-col"><span>x<sub>B</sub></span><span>y<sub>B</sub></span><span>z<sub>B</sub></span><span>1</span></div></div>
+            `;
+      }
+
+      // --- 메인 업데이트 루프 ---
+      function updateScene() {
+        const thetaDeg = parseFloat(slider.value);
+        const thetaRad = THREE.MathUtils.degToRad(thetaDeg);
+        degDisplay.innerText = thetaDeg;
+
+        // 1. Frame B 회전 (Diagram 축 -> Three 축 매핑)
+        frameB.rotation.set(0, 0, 0); // 초기화
+        if (currentAxis === "x")
+          frameB.rotation.z = thetaRad; // Diag X = Three Z
+        else if (currentAxis === "y")
+          frameB.rotation.x = thetaRad; // Diag Y = Three X
+        else frameB.rotation.y = thetaRad; // Diag Z = Three Y
+        frameB.updateMatrixWorld();
+
+        // 2. 점 P 계산
+        let pA_three, pB_three;
+
+        if (isPointFixedToB) {
+          pB_three = pointMesh.position.clone();
+          pA_three = pB_three.clone().applyMatrix4(frameB.matrixWorld);
+        } else {
+          pA_three = pointMesh.position.clone();
+          const frameBInverse = new THREE.Matrix4()
+            .copy(frameB.matrixWorld)
+            .invert();
+          pB_three = pA_three.clone().applyMatrix4(frameBInverse);
+        }
+
+        // 라벨 위치 갱신
+        labels.p.pos
+          .copy(isPointFixedToB ? pB_three : pA_three)
+          .add(new THREE.Vector3(0.3, 0.3, 0));
+
+        // 3. 투영선 그리기 (선택된 축에 직교하는 평면의 두 축으로 선 그리기)
+        const pB_diag = toDiag(pB_three);
+        const pA_diag = toDiag(pA_three);
+
+        function setProjectionLines(linesObj, p_diag) {
+          let p1_diag, p2_diag;
+          if (currentAxis === "x") {
+            p1_diag = new THREE.Vector3(p_diag.x, p_diag.y, 0);
+            p2_diag = new THREE.Vector3(p_diag.x, 0, p_diag.z);
+          } else if (currentAxis === "y") {
+            p1_diag = new THREE.Vector3(p_diag.x, p_diag.y, 0);
+            p2_diag = new THREE.Vector3(0, p_diag.y, p_diag.z);
+          } else {
+            p1_diag = new THREE.Vector3(p_diag.x, 0, p_diag.z);
+            p2_diag = new THREE.Vector3(0, p_diag.y, p_diag.z);
+          }
+          const p_three = toThree(p_diag);
+          linesObj[0].geometry.setFromPoints([p_three, toThree(p1_diag)]);
+          linesObj[1].geometry.setFromPoints([p_three, toThree(p2_diag)]);
+          linesObj[0].computeLineDistances();
+          linesObj[1].computeLineDistances();
+        }
+
+        setProjectionLines([lines.b1, lines.b2], pB_diag);
+        setProjectionLines([lines.a1, lines.a2], pA_diag);
+
+        // 4. 회전 호 (Arc) 그리기
+        if (arcMesh) scene.remove(arcMesh);
+        if (thetaRad !== 0) {
+          let r, baseAngle;
+          const pFixed_diag = toDiag(
+            isPointFixedToB ? pB_local_three : pB_local_three,
+          ); // 기준점 계산용
+
+          if (currentAxis === "x") {
+            r = Math.hypot(pFixed_diag.y, pFixed_diag.z);
+            baseAngle = Math.atan2(pFixed_diag.z, pFixed_diag.y);
+          } else if (currentAxis === "y") {
+            r = Math.hypot(pFixed_diag.x, pFixed_diag.z);
+            baseAngle = Math.atan2(pFixed_diag.x, pFixed_diag.z);
+          } else {
+            r = Math.hypot(pFixed_diag.x, pFixed_diag.y);
+            baseAngle = Math.atan2(pFixed_diag.y, pFixed_diag.x);
+          }
+
+          const arcPoints = [];
+          const segments = 32;
+          for (let i = 0; i <= segments; i++) {
+            const t = baseAngle + (i / segments) * thetaRad;
+            let pt_diag;
+            if (currentAxis === "x")
+              pt_diag = new THREE.Vector3(
+                pFixed_diag.x,
+                r * Math.cos(t),
+                r * Math.sin(t),
+              );
+            else if (currentAxis === "y")
+              pt_diag = new THREE.Vector3(
+                r * Math.sin(t),
+                pFixed_diag.y,
+                r * Math.cos(t),
+              );
+            else
+              pt_diag = new THREE.Vector3(
+                r * Math.cos(t),
+                r * Math.sin(t),
+                pFixed_diag.z,
+              );
+
+            // 우주 고정 모드일때는 Arc를 역방향(Frame B 관점)으로 그림
+            let pt_three = toThree(pt_diag);
+            if (!isPointFixedToB) {
+              const frameBInverse = new THREE.Matrix4()
+                .copy(frameB.matrixWorld)
+                .invert();
+              pt_three.applyMatrix4(frameBInverse);
+            }
+            arcPoints.push(pt_three);
+          }
+
+          arcMesh = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints(arcPoints),
+            new THREE.LineBasicMaterial({ color: 0xdc2626, linewidth: 2 }),
+          );
+
+          if (isPointFixedToB) scene.add(arcMesh);
+          else frameB.add(arcMesh);
+
+          // Theta 라벨 위치
+          const midIdx = Math.floor(segments / 2);
+          labels.th.pos.copy(arcPoints[midIdx]);
+          if (isPointFixedToB) labels.th.parent = scene;
+          else labels.th.parent = frameB;
+          labels.th.el.style.display = "block";
+        } else {
+          labels.th.el.style.display = "none";
+        }
+
+        // 5. UI 텍스트 업데이트
+        renderMathUI(thetaDeg, thetaRad);
+
+        // 예시 좌표계 (Diagram 기준 X, Y, Z 매핑)
+        const bX = pB_diag.x.toFixed(2),
+          bY = pB_diag.y.toFixed(2),
+          bZ = pB_diag.z.toFixed(2);
+        const aX = pA_diag.x.toFixed(2),
+          aY = pA_diag.y.toFixed(2),
+          aZ = pA_diag.z.toFixed(2);
+
+        if (isPointFixedToB) {
+          exampleLeft.innerHTML = `
+                    <p class="text-gray-500 mb-1 text-xs">Frame B 기준 (고정)</p>
+                    <p class="font-bold tracking-tight">P<sub>B</sub> = [ ${bX}, <span class="text-blue-600">${bY}</span>, <span class="text-blue-600">${bZ}</span> ]</p>
+                `;
+          exampleRight.innerHTML = `
+                    <p class="text-gray-500 mb-1 text-xs">Frame A 기준 (계산됨)</p>
+                    <p class="font-bold text-orange-600 tracking-tight">P<sub>A</sub> = [ ${aX}, ${aY}, ${aZ} ]</p>
+                `;
+        } else {
+          exampleLeft.innerHTML = `
+                    <p class="text-gray-500 mb-1 text-xs">Frame B 기준 (계산됨)</p>
+                    <p class="font-bold text-teal-600 tracking-tight">P<sub>B</sub> = [ ${bX}, ${bY}, ${bZ} ]</p>
+                `;
+          exampleRight.innerHTML = `
+                    <p class="text-gray-500 mb-1 text-xs">Frame A 기준 (고정)</p>
+                    <p class="font-bold tracking-tight">P<sub>A</sub> = [ ${aX}, <span class="text-blue-600">${aY}</span>, <span class="text-blue-600">${aZ}</span> ]</p>
+                `;
+        }
+      }
+
       function updateLabels() {
         const width = container.clientWidth;
         const height = container.clientHeight;
-
         for (const key in labels) {
           const label = labels[key];
           const pos = label.pos.clone();
-          if (label.parent === frameB) {
-            pos.applyMatrix4(frameB.matrixWorld);
-          }
+          if (label.parent === frameB) pos.applyMatrix4(frameB.matrixWorld);
 
           pos.project(camera);
-
-          // 화면 뒤에 있는 경우 숨김
           if (pos.z > 1) {
             label.el.style.display = "none";
             continue;
           }
 
           label.el.style.display = "block";
-          const x = (pos.x * 0.5 + 0.5) * width;
-          const y = -(pos.y * 0.5 - 0.5) * height;
-          label.el.style.left = `${x}px`;
-          label.el.style.top = `${y}px`;
+          label.el.style.left = `${(pos.x * 0.5 + 0.5) * width}px`;
+          label.el.style.top = `${-(pos.y * 0.5 - 0.5) * height}px`;
         }
-      }
-
-      // --- 로직 업데이트 함수 ---
-      function updateScene() {
-        const thetaDeg = parseFloat(slider.value);
-        const thetaRad = THREE.MathUtils.degToRad(thetaDeg);
-
-        // 1. Frame B 회전 (Diagram의 X축 회전은 Three.js의 Z축 회전에 해당함)
-        frameB.rotation.z = thetaRad;
-
-        // 2. 투영선 업데이트
-        // Frame B 로컬 선 (P -> Y_B 축, P -> Z_B 축)
-        lines.b_y.geometry.setFromPoints([
-          pB_local,
-          new THREE.Vector3(pB_local.x, 0, 0),
-        ]);
-        lines.b_z.geometry.setFromPoints([
-          pB_local,
-          new THREE.Vector3(0, pB_local.y, 0),
-        ]);
-        lines.b_y.computeLineDistances();
-        lines.b_z.computeLineDistances();
-
-        // Frame A 전역 선 (P_A -> Y_A 축, P_A -> Z_A 축)
-        const pA_global = pB_local.clone().applyMatrix4(frameB.matrixWorld);
-        lines.a_y.geometry.setFromPoints([
-          pA_global,
-          new THREE.Vector3(pA_global.x, 0, 0),
-        ]);
-        lines.a_z.geometry.setFromPoints([
-          pA_global,
-          new THREE.Vector3(0, pA_global.y, 0),
-        ]);
-        lines.a_y.computeLineDistances();
-        lines.a_z.computeLineDistances();
-
-        // 3. 회전 호 (Arc) 그리기
-        if (arcMesh) scene.remove(arcMesh);
-        if (thetaRad !== 0) {
-          const arcRadius = 2.5;
-          const points = [];
-          const segments = 32;
-          for (let i = 0; i <= segments; i++) {
-            const t = (i / segments) * thetaRad;
-            // X, Y 평면 (Three.js 기준) 에서 호 그리기
-            points.push(
-              new THREE.Vector3(
-                arcRadius * Math.cos(t),
-                arcRadius * Math.sin(t),
-                0,
-              ),
-            );
-          }
-          const arcGeo = new THREE.BufferGeometry().setFromPoints(points);
-          const arcMat = new THREE.LineBasicMaterial({
-            color: 0xdc2626,
-            linewidth: 2,
-          });
-          arcMesh = new THREE.Line(arcGeo, arcMat);
-          scene.add(arcMesh);
-
-          // Theta 라벨 위치 설정 (호의 중간점)
-          labels.th.pos.set(
-            (arcRadius + 0.4) * Math.cos(thetaRad / 2),
-            (arcRadius + 0.4) * Math.sin(thetaRad / 2),
-            0,
-          );
-          labels.th.el.style.display = "block";
-        } else {
-          labels.th.el.style.display = "none";
-        }
-
-        // 4. UI 텍스트 업데이트
-        degDisplay.innerText = thetaDeg;
-        degTexts.forEach((el) => (el.innerText = thetaDeg));
-
-        const cosVal = Math.cos(thetaRad);
-        const sinVal = Math.sin(thetaRad);
-
-        m11.innerText = cosVal.toFixed(2);
-        m12.innerText = (-sinVal).toFixed(2);
-        m21.innerText = sinVal.toFixed(2);
-        m22.innerText = cosVal.toFixed(2);
-
-        // 점 P 좌표 계산 (Three.js 좌표를 Diagram 기준 y, z로 표시)
-        // pA_global.x 가 Diagram의 y_A
-        // pA_global.y 가 Diagram의 z_A
-        paY.innerText = pA_global.x.toFixed(2);
-        paZ.innerText = pA_global.y.toFixed(2);
       }
 
       // --- 이벤트 리스너 ---
       slider.addEventListener("input", updateScene);
 
+      const btnModeB = document.getElementById("btn-mode-b");
+      const btnModeA = document.getElementById("btn-mode-a");
+      const exampleBox = document.getElementById("example-box");
+      const exampleTitle = document.getElementById("example-title");
+
+      btnModeB.addEventListener("click", () => {
+        isPointFixedToB = true;
+        btnModeB.className =
+          "flex-1 py-1 px-1 rounded-md bg-white shadow font-semibold text-blue-600 transition-all";
+        btnModeA.className =
+          "flex-1 py-1 px-1 rounded-md text-gray-500 hover:text-gray-700 transition-all";
+        frameB.add(pointMesh);
+        pointMesh.position.copy(pB_local_three);
+        labels.p.parent = frameB;
+        exampleBox.className =
+          "bg-orange-50 border border-orange-200 p-4 rounded-xl transition-colors";
+        exampleTitle.innerText = "점 P의 좌표 변환 예시 (Frame B에 고정)";
+        exampleTitle.className = "font-semibold text-orange-800 mb-2 text-sm";
+        updateScene();
+      });
+
+      btnModeA.addEventListener("click", () => {
+        isPointFixedToB = false;
+        btnModeA.className =
+          "flex-1 py-1 px-1 rounded-md bg-white shadow font-semibold text-teal-600 transition-all";
+        btnModeB.className =
+          "flex-1 py-1 px-1 rounded-md text-gray-500 hover:text-gray-700 transition-all";
+        scene.add(pointMesh);
+        pointMesh.position.copy(pB_local_three);
+        labels.p.parent = scene;
+        exampleBox.className =
+          "bg-teal-50 border border-teal-200 p-4 rounded-xl transition-colors";
+        exampleTitle.innerText = "점 P의 좌표 변환 예시 (우주 공간에 고정)";
+        exampleTitle.className = "font-semibold text-teal-800 mb-2 text-sm";
+        updateScene();
+      });
+
       window.addEventListener("resize", () => {
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-        renderer.setSize(width, height);
-        camera.aspect = width / height;
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        camera.aspect = container.clientWidth / container.clientHeight;
         camera.updateProjectionMatrix();
       });
 
-      // --- 애니메이션 루프 ---
       function animate() {
         requestAnimationFrame(animate);
         controls.update();
@@ -544,8 +732,8 @@
         renderer.render(scene, camera);
       }
 
-      // 초기화 실행
-      updateScene();
+      // 초기화
+      setAxis("x");
       animate();
     </script>
   </body>
