@@ -3,8 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DH 파라미터 심볼릭 계산기 (덧셈정리 적용)</title>
+    <title>Standard DH 심볼릭 계산기 (덧셈정리 & LaTeX 적용)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax 렌더링 라이브러리 추가 -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [["\\(", "\\)"]],
+          displayMath: [["$$", "$$"]],
+        },
+      };
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+      id="MathJax-script"
+      async
+    ></script>
     <style>
       body {
         font-family: "Consolas", "Courier New", monospace;
@@ -17,13 +31,13 @@
   <body class="bg-gray-900 text-gray-200 p-8 min-h-screen">
     <div class="max-w-6xl mx-auto">
       <h1 class="text-3xl font-bold text-blue-400 mb-6">
-        Denavit-Hartenberg (DH) 심볼릭 계산기 - standard ver.
+        Standard DH 심볼릭 계산기
       </h1>
 
       <div class="bg-gray-800 rounded-lg p-6 mb-8 shadow-lg">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold text-green-400">
-            DH 파라미터 입력 표
+            Standard DH 파라미터 입력 표
           </h2>
           <div class="space-x-2">
             <button
@@ -62,6 +76,7 @@
             <thead>
               <tr class="bg-gray-700 text-gray-300">
                 <th class="p-3 border-b border-gray-600 text-center w-12">i</th>
+                <!-- Standard DH에 맞게 컬럼 헤더 변경 -->
                 <th class="p-3 border-b border-gray-600">αᵢ (Alpha)</th>
                 <th class="p-3 border-b border-gray-600">aᵢ (Link Length)</th>
                 <th class="p-3 border-b border-gray-600">dᵢ (Link Offset)</th>
@@ -281,8 +296,6 @@
                 let s2_p = rem2.find((x) => x.startsWith("S")),
                   c2_p = rem2.find((x) => x.startsWith("C"));
                 if (s1_p && c1_p && s2_p && c2_p) {
-                  // 기존 코드의 버그: 바깥쪽 c1(계수) 변수명과 아래첨자를 추출하는 변수명이 겹쳤음.
-                  // c1_idx, s2_idx 등으로 명확하게 변수명을 분리하여 섀도잉(충돌) 현상 해결
                   let s1_idx = s1_p.substring(1),
                     c1_idx = c1_p.substring(1);
                   let s2_idx = s2_p.substring(1),
@@ -340,7 +353,44 @@
       }
 
       // ==========================================
-      // 행렬 연산
+      // LaTeX (마크다운 수식) 변환기
+      // ==========================================
+      function polyToLaTeX(polyStr) {
+        const subs = {
+          "₀": "0",
+          "₁": "1",
+          "₂": "2",
+          "₃": "3",
+          "₄": "4",
+          "₅": "5",
+          "₆": "6",
+          "₇": "7",
+          "₈": "8",
+          "₉": "9",
+        };
+        let res = polyStr;
+
+        // 아래첨자 변환 (예: C₁₂ -> C_{12})
+        res = res.replace(/([₀-₉]+)/g, (match) => {
+          let digits = match
+            .split("")
+            .map((c) => subs[c])
+            .join("");
+          return `_{${digits}}`;
+        });
+
+        // 특수 기호를 LaTeX 명령어로 변환
+        res = res
+          .replace(/π/g, "\\pi ")
+          .replace(/θ/g, "\\theta ")
+          .replace(/α/g, "\\alpha ");
+
+        // 공백을 얇은 공백으로 변경
+        return res;
+      }
+
+      // ==========================================
+      // 행렬 연산 (Standard DH 방식)
       // ==========================================
 
       function getSymbolicDHMatrix(alpha, a, d, theta) {
@@ -354,6 +404,7 @@
         const neg_st = multPolys(stringToPoly("-1"), st);
         const neg_ct = multPolys(stringToPoly("-1"), ct);
 
+        // Standard DH 행렬 구조
         return [
           [ct, multPolys(neg_st, ca), multPolys(st, sa), multPolys(a_poly, ct)],
           [st, multPolys(ct, ca), multPolys(neg_ct, sa), multPolys(a_poly, st)],
@@ -414,17 +465,20 @@
       }
 
       function matrixToHTML(title, matrix) {
+        let latex = `$$ \\begin{bmatrix} `;
+        for (let i = 0; i < 4; i++) {
+          let row = [];
+          for (let j = 0; j < 4; j++) {
+            let cellStr = polyToString(matrix[i][j]);
+            row.push(polyToLaTeX(cellStr));
+          }
+          latex += row.join(" & ") + (i < 3 ? ` \\\\ ` : ``);
+        }
+        latex += ` \\end{bmatrix} $$`;
+
         let html = `<div class="bg-gray-800 p-5 rounded-lg shadow-xl border border-gray-700 overflow-x-auto">
                         <h3 class="text-xl font-bold text-yellow-300 mb-4 whitespace-nowrap">${title}</h3>`;
-        html += `<table class="matrix-table w-full text-center border-collapse">`;
-        for (let i = 0; i < 4; i++) {
-          html += `<tr>`;
-          for (let j = 0; j < 4; j++) {
-            html += `<td class="border border-gray-600 p-4 font-mono text-gray-200 whitespace-nowrap text-lg">${polyToString(matrix[i][j])}</td>`;
-          }
-          html += `</tr>`;
-        }
-        html += `</table></div>`;
+        html += `<div class="text-xl text-gray-200 overflow-x-auto w-full flex justify-center py-4 cursor-text select-text">${latex}</div></div>`;
         return html;
       }
 
@@ -460,7 +514,7 @@
             theta || "0",
           );
           matrices.push(T);
-          htmlOutput += matrixToHTML(`T<sub>${i + 1}</sub> (Link ${i + 1})`, T);
+          htmlOutput += matrixToHTML(`\\( T_{${i + 1}} \\) (Link ${i + 1})`, T);
         });
 
         if (matrices.length > 0) {
@@ -471,19 +525,33 @@
 
           let equationName = Array.from(
             { length: matrices.length },
-            (_, i) => `T<sub>${i + 1}</sub>`,
-          ).join(" &times; ");
+            (_, i) => `T_{${i + 1}}`,
+          ).join(" \\times ");
           htmlOutput += `<div class="mt-12"></div>`;
           htmlOutput += matrixToHTML(
-            `최종 변환 행렬 (${equationName})`,
+            `최종 변환 행렬 (\\( ${equationName} \\))`,
             T_total,
           );
         }
 
         outputDiv.innerHTML = htmlOutput;
+
+        // 추가된 수식들을 MathJax를 통해 비동기로 렌더링
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          MathJax.typesetPromise([outputDiv]).catch((err) =>
+            console.error("MathJax error:", err.message),
+          );
+        } else {
+          setTimeout(() => {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+              MathJax.typesetPromise([outputDiv]);
+            }
+          }, 300);
+        }
       }
 
       window.onload = () => {
+        // 처음 업로드 해주신 Standard DH 표의 값으로 기본 세팅
         addRow("pi/2", "l1", "0", "theta1");
         addRow("0", "l2", "0", "theta2");
         addRow("0", "l3", "0", "theta3");
