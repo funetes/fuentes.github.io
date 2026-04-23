@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Standard DH 심볼릭 계산기 (덧셈정리 & LaTeX 적용)</title>
+    <title>Standard DH 심볼릭 계산기</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- MathJax 렌더링 라이브러리 추가 -->
     <script>
@@ -464,21 +464,74 @@
         });
       }
 
+      // ==========================================
+      // 클립보드 복사 기능
+      // ==========================================
+      function copyToClipboard(btn) {
+        const latexStr = btn.getAttribute("data-latex");
+
+        // iFrame 환경 제약을 우회하기 위한 텍스트 에어리어 폴백 방식 적용
+        const textArea = document.createElement("textarea");
+        textArea.value = latexStr;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          document.execCommand("copy");
+          // 복사 성공 시 버튼 UI 피드백
+          const originalText = btn.innerText;
+          btn.innerText = " ✓ ";
+          btn.classList.remove("bg-blue-600", "hover:bg-blue-500");
+          btn.classList.add("bg-green-600", "hover:bg-green-500");
+
+          setTimeout(() => {
+            btn.innerText = originalText;
+            btn.classList.remove("bg-green-600", "hover:bg-green-500");
+            btn.classList.add("bg-blue-600", "hover:bg-blue-500");
+          }, 2000);
+        } catch (err) {
+          console.error("Clipboard copy failed", err);
+          const originalText = btn.innerText;
+          btn.innerText = "❌ 실패";
+          btn.classList.remove("bg-blue-600", "hover:bg-blue-500");
+          btn.classList.add("bg-red-600", "hover:bg-red-500");
+
+          setTimeout(() => {
+            btn.innerText = originalText;
+            btn.classList.remove("bg-red-600", "hover:bg-red-500");
+            btn.classList.add("bg-blue-600", "hover:bg-blue-500");
+          }, 2000);
+        }
+
+        document.body.removeChild(textArea);
+      }
+
       function matrixToHTML(title, matrix) {
-        let latex = `$$ \\begin{bmatrix} `;
+        // 붙여넣기 했을 때 가독성을 높이기 위해 줄바꿈(\n)을 포함한 LaTeX 생성
+        let latexRaw = `\\begin{bmatrix}\n`;
         for (let i = 0; i < 4; i++) {
           let row = [];
           for (let j = 0; j < 4; j++) {
             let cellStr = polyToString(matrix[i][j]);
             row.push(polyToLaTeX(cellStr));
           }
-          latex += row.join(" & ") + (i < 3 ? ` \\\\ ` : ``);
+          latexRaw += "  " + row.join(" & ") + (i < 3 ? ` \\\\\n` : `\n`);
         }
-        latex += ` \\end{bmatrix} $$`;
+        latexRaw += `\\end{bmatrix}`;
+
+        let displayLatex = `$$ ${latexRaw} $$`;
+        // HTML 속성에 수식을 안전하게 넣기 위해 따옴표 이스케이프
+        let escapedLatex = displayLatex.replace(/"/g, "&quot;");
 
         let html = `<div class="bg-gray-800 p-5 rounded-lg shadow-xl border border-gray-700 overflow-x-auto">
-                        <h3 class="text-xl font-bold text-yellow-300 mb-4 whitespace-nowrap">${title}</h3>`;
-        html += `<div class="text-xl text-gray-200 overflow-x-auto w-full flex justify-center py-4 cursor-text select-text">${latex}</div></div>`;
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-yellow-300 whitespace-nowrap">${title}</h3>
+                            <button onclick="copyToClipboard(this)" data-latex="${escapedLatex}" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-3 py-1 rounded transition shadow font-bold">COPY</button>
+                        </div>`;
+        html += `<div class="text-xl text-gray-200 overflow-x-auto w-full flex justify-center py-4 cursor-text select-text">${displayLatex}</div></div>`;
         return html;
       }
 
