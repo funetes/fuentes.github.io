@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modified DH 심볼릭 계산기 (덧셈정리 적용)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Consolas", "Courier New", monospace;
+      }
+      .matrix-table td {
+        min-width: 80px;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-gray-200 p-8 min-h-screen">
+    <div class="max-w-6xl mx-auto">
+      <h1 class="text-3xl font-bold text-blue-400 mb-6">
+        Modified DH (Craig 표기법) 심볼릭 계산기 - modifed ver.
+      </h1>
+
+      <div class="bg-gray-800 rounded-lg p-6 mb-8 shadow-lg">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-green-400">
+            DH 파라미터 입력 표
+          </h2>
+          <div class="space-x-2">
+            <button
+              onclick="addRow()"
+              class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition"
+            >
+              행 추가 (+)
+            </button>
+            <button
+              onclick="calculate()"
+              class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded transition font-bold"
+            >
+              행렬 계산하기
+            </button>
+          </div>
+        </div>
+
+        <p class="text-sm text-gray-400 mb-4">
+          💡 <strong>입력 팁:</strong>
+          <code class="bg-gray-700 px-1 rounded">pi/2</code>,
+          <code class="bg-gray-700 px-1 rounded">theta1</code>,
+          <code class="bg-gray-700 px-1 rounded">l1</code> 등으로 입력하면
+          기호(π/2, θ₁, l₁)로 자동 변환됩니다. <br />
+          💡 각도 θ에 대해서는 행렬의 가독성을 위해
+          <code class="bg-gray-700 px-1 rounded">C₁</code>,
+          <code class="bg-gray-700 px-1 rounded">S₁</code> 로 축약
+          표시됩니다.<br />
+          ✨ <strong>스마트 연산:</strong> 행렬 곱셈 시
+          <code class="bg-gray-700 px-1 rounded">C₁C₂ - S₁S₂</code> 와 같은 식은
+          삼각함수 덧셈정리에 의해 자동으로
+          <code class="bg-gray-700 px-1 rounded">C₁₂</code> 로 압축됩니다.
+        </p>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-700 text-gray-300">
+                <th class="p-3 border-b border-gray-600 text-center w-12">i</th>
+                <th class="p-3 border-b border-gray-600">αᵢ₋₁ (Alpha)</th>
+                <th class="p-3 border-b border-gray-600">aᵢ₋₁ (Link Length)</th>
+                <th class="p-3 border-b border-gray-600">dᵢ (Link Offset)</th>
+                <th class="p-3 border-b border-gray-600">θᵢ (Joint Angle)</th>
+                <th class="p-3 border-b border-gray-600 text-center w-24">
+                  관리
+                </th>
+              </tr>
+            </thead>
+            <tbody id="dh-body">
+              <!-- 행이 JavaScript를 통해 동적으로 추가됩니다 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="output" class="space-y-8">
+        <!-- 행렬 결과가 여기에 표시됩니다. -->
+      </div>
+    </div>
+
+    <script>
+      // ==========================================
+      // 다항식 기반의 심볼릭 수학 연산 엔진 (CAS)
+      // ==========================================
+
+      function formatSymbol(val) {
+        if (!val) return "";
+        let v = val.trim();
+        v = v
+          .replace(/theta/gi, "θ")
+          .replace(/alpha/gi, "α")
+          .replace(/pi/gi, "π");
+        v = v.replace(/([a-zA-Zθαπ])(\d+)/g, (match, p1, p2) => {
+          const subs = {
+            0: "₀",
+            1: "₁",
+            2: "₂",
+            3: "₃",
+            4: "₄",
+            5: "₅",
+            6: "₆",
+            7: "₇",
+            8: "₈",
+            9: "₉",
+          };
+          let subStr = p2
+            .split("")
+            .map((char) => subs[char])
+            .join("");
+          return p1 + subStr;
+        });
+        return v;
+      }
+
+      // 항(Term) 내부의 문자들을 정렬 (상수/길이가 앞, 삼각함수가 뒤로 오도록)
+      function sortParts(parts) {
+        return parts.sort((a, b) => {
+          let aIsTrig = /^[CS][₀-₉]+$/.test(a);
+          let bIsTrig = /^[CS][₀-₉]+$/.test(b);
+          if (aIsTrig && !bIsTrig) return 1;
+          if (!aIsTrig && bIsTrig) return -1;
+          return a.localeCompare(b);
+        });
+      }
+
+      function stringToPoly(str) {
+        if (!str || str === "0") return [];
+        if (str === "1") return [{ val: 1, parts: [] }];
+        if (str === "-1") return [{ val: -1, parts: [] }];
+
+        let sign = 1;
+        if (str.startsWith("-")) {
+          sign = -1;
+          str = str.substring(1).trim();
+        }
+        if (str === "1") return [{ val: sign, parts: [] }];
+        return [{ val: sign, parts: [str] }];
+      }
+
+      function getTrigPoly(func, val) {
+        let v = val.toLowerCase().replace(/\s/g, "");
+        if (v === "0") return func === "cos" ? stringToPoly("1") : [];
+        if (v === "90" || v === "π/2")
+          return func === "cos" ? [] : stringToPoly("1");
+        if (v === "-90" || v === "-π/2")
+          return func === "cos" ? [] : stringToPoly("-1");
+        if (v === "180" || v === "π")
+          return func === "cos" ? stringToPoly("-1") : [];
+
+        let match = val.match(/^θ([₀-₉]+)$/);
+        if (match) {
+          return stringToPoly(func === "cos" ? `C${match[1]}` : `S${match[1]}`);
+        }
+        return stringToPoly(`${func}(${val})`);
+      }
+
+      function multPolys(p1, p2) {
+        if (p1.length === 0 || p2.length === 0) return [];
+        let res = [];
+        for (let t1 of p1) {
+          for (let t2 of p2) {
+            let parts = [...t1.parts, ...t2.parts].filter((p) => p !== "1");
+            res.push({ val: t1.val * t2.val, parts: parts });
+          }
+        }
+        return res;
+      }
+
+      function addPolys(...polys) {
+        let res = [];
+        for (let p of polys) res.push(...p);
+        return res;
+      }
+
+      // 첨자(아래첨자) 정규화 도구: '₁₂'와 '₃'이 만나면 '₁₂₃'으로 정렬
+      function normalizeIdx(str1, str2) {
+        return (str1 + str2).split("").sort().join("");
+      }
+
+      // 다항식 정리 및 덧셈정리 적용의 핵심 함수
+      function simplifyPoly(poly) {
+        // 1단계: 동류항 묶기 (부호가 다르면 상쇄)
+        let groups = {};
+        for (let t of poly) {
+          t.parts = sortParts(t.parts);
+          let key = t.parts.join(" ");
+          if (!groups[key]) groups[key] = 0;
+          groups[key] += t.val;
+        }
+
+        let terms = [];
+        for (let key in groups) {
+          if (groups[key] !== 0)
+            terms.push({ val: groups[key], parts: key ? key.split(" ") : [] });
+        }
+
+        // 2단계: 삼각함수 덧셈정리 적용
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (let i = 0; i < terms.length; i++) {
+            if (terms[i].val === 0) continue;
+            for (let j = i + 1; j < terms.length; j++) {
+              if (terms[j].val === 0) continue;
+
+              let t1 = terms[i],
+                t2 = terms[j];
+
+              // 상호 계수(trig가 아닌 부분)가 일치해야 묶을 수 있음
+              let c1 = t1.parts
+                .filter((p) => !/^[CS][₀-₉]+$/.test(p))
+                .join(" ");
+              let c2 = t2.parts
+                .filter((p) => !/^[CS][₀-₉]+$/.test(p))
+                .join(" ");
+              if (c1 !== c2) continue;
+
+              let tr1 = t1.parts.filter((p) => /^[CS][₀-₉]+$/.test(p));
+              let tr2 = t2.parts.filter((p) => /^[CS][₀-₉]+$/.test(p));
+
+              // 공통 삼각함수 추출
+              let commonTrigs = [],
+                rem1 = [...tr1],
+                rem2 = [...tr2];
+              for (let k = rem1.length - 1; k >= 0; k--) {
+                let idx = rem2.indexOf(rem1[k]);
+                if (idx !== -1) {
+                  commonTrigs.push(rem1[k]);
+                  rem1.splice(k, 1);
+                  rem2.splice(idx, 1);
+                }
+              }
+
+              if (
+                rem1.length === 2 &&
+                rem2.length === 2 &&
+                Math.abs(t1.val) === Math.abs(t2.val)
+              ) {
+                let r1_C = rem1.every((x) => x.startsWith("C"));
+                let r1_S = rem1.every((x) => x.startsWith("S"));
+                let r2_C = rem2.every((x) => x.startsWith("C"));
+                let r2_S = rem2.every((x) => x.startsWith("S"));
+
+                // [Cosine 덧셈정리] C_a C_b - S_a S_b = C_{ab}
+                if ((r1_C && r2_S) || (r1_S && r2_C)) {
+                  let c_rem = r1_C ? rem1 : rem2;
+                  let s_rem = r1_S ? rem1 : rem2;
+                  let c_val = r1_C ? t1.val : t2.val;
+                  let s_val = r1_S ? t1.val : t2.val;
+
+                  let c_idx = normalizeIdx(
+                    c_rem[0].substring(1),
+                    c_rem[1].substring(1),
+                  );
+                  let s_idx = normalizeIdx(
+                    s_rem[0].substring(1),
+                    s_rem[1].substring(1),
+                  );
+
+                  if (c_idx === s_idx && c_val === -s_val) {
+                    terms[i].val = c_val;
+                    terms[i].parts = sortParts([
+                      ...c1.split(" ").filter(Boolean),
+                      ...commonTrigs,
+                      "C" + c_idx,
+                    ]);
+                    terms[j].val = 0;
+                    changed = true;
+                    break;
+                  }
+                }
+
+                // [Sine 덧셈정리] S_a C_b + C_a S_b = S_{ab}
+                let s1_p = rem1.find((x) => x.startsWith("S")),
+                  c1_p = rem1.find((x) => x.startsWith("C"));
+                let s2_p = rem2.find((x) => x.startsWith("S")),
+                  c2_p = rem2.find((x) => x.startsWith("C"));
+                if (s1_p && c1_p && s2_p && c2_p) {
+                  // 기존 코드의 버그: 바깥쪽 c1(계수) 변수명과 아래첨자를 추출하는 변수명이 겹쳤음.
+                  // c1_idx, s2_idx 등으로 명확하게 변수명을 분리하여 섀도잉(충돌) 현상 해결
+                  let s1_idx = s1_p.substring(1),
+                    c1_idx = c1_p.substring(1);
+                  let s2_idx = s2_p.substring(1),
+                    c2_idx = c2_p.substring(1);
+
+                  if (
+                    s1_idx === c2_idx &&
+                    c1_idx === s2_idx &&
+                    t1.val === t2.val
+                  ) {
+                    let idx_str = normalizeIdx(s1_idx, c1_idx);
+                    terms[i].val = t1.val;
+                    terms[i].parts = sortParts([
+                      ...c1.split(" ").filter(Boolean),
+                      ...commonTrigs,
+                      "S" + idx_str,
+                    ]);
+                    terms[j].val = 0;
+                    changed = true;
+                    break;
+                  }
+                }
+              }
+            }
+            if (changed) break;
+          }
+          terms = terms.filter((t) => t.val !== 0);
+        }
+        return terms;
+      }
+
+      // 다항식을 문자열로 출력
+      function polyToString(poly) {
+        if (poly.length === 0) return "0";
+        let res = "";
+        for (let i = 0; i < poly.length; i++) {
+          let t = poly[i];
+          let valAbs = Math.abs(t.val);
+          let signStr = t.val < 0 ? "-" : "+";
+          let partsStr = t.parts.join(" ");
+
+          if (i === 0) {
+            if (t.val < 0) res += "-";
+            if (valAbs !== 1 || partsStr === "")
+              res += valAbs + (partsStr ? " " : "");
+            res += partsStr;
+          } else {
+            res += ` ${signStr} `;
+            if (valAbs !== 1 || partsStr === "")
+              res += valAbs + (partsStr ? " " : "");
+            res += partsStr;
+          }
+        }
+        return res === "" ? "0" : res;
+      }
+
+      // ==========================================
+      // 행렬 연산
+      // ==========================================
+
+      function getSymbolicDHMatrix(alpha, a, d, theta) {
+        const ct = getTrigPoly("cos", theta);
+        const st = getTrigPoly("sin", theta);
+        const ca = getTrigPoly("cos", alpha);
+        const sa = getTrigPoly("sin", alpha);
+
+        const a_poly = stringToPoly(a);
+        const d_poly = stringToPoly(d);
+        const neg_st = multPolys(stringToPoly("-1"), st);
+        const neg_sa = multPolys(stringToPoly("-1"), sa);
+
+        return [
+          [ct, neg_st, [], a_poly],
+          [
+            multPolys(st, ca),
+            multPolys(ct, ca),
+            neg_sa,
+            multPolys(multPolys(stringToPoly("-1"), d_poly), sa),
+          ],
+          [multPolys(st, sa), multPolys(ct, sa), ca, multPolys(d_poly, ca)],
+          [[], [], [], stringToPoly("1")],
+        ];
+      }
+
+      function multiplySymbolicMatrices(m1, m2) {
+        let result = Array(4)
+          .fill(0)
+          .map(() => Array(4).fill([]));
+        for (let i = 0; i < 4; i++) {
+          for (let j = 0; j < 4; j++) {
+            let sumPoly = [];
+            for (let k = 0; k < 4; k++) {
+              let prod = multPolys(m1[i][k], m2[k][j]);
+              sumPoly = addPolys(sumPoly, prod);
+            }
+            result[i][j] = simplifyPoly(sumPoly);
+          }
+        }
+        return result;
+      }
+
+      // ==========================================
+      // UI 로직
+      // ==========================================
+
+      let rowCount = 0;
+
+      function addRow(alpha = "", a = "", d = "", theta = "") {
+        rowCount++;
+        const tbody = document.getElementById("dh-body");
+        const tr = document.createElement("tr");
+        tr.className = "border-b border-gray-700 hover:bg-gray-750 transition";
+        tr.innerHTML = `
+                <td class="p-3 text-center font-bold text-gray-400">${rowCount}</td>
+                <td class="p-3"><input type="text" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-blue-500" value="${alpha}" placeholder="π/2, α1..."></td>
+                <td class="p-3"><input type="text" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-blue-500" value="${a}" placeholder="l1..."></td>
+                <td class="p-3"><input type="text" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-blue-500" value="${d}" placeholder="d1..."></td>
+                <td class="p-3"><input type="text" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-blue-500" value="${theta}" placeholder="θ1..."></td>
+                <td class="p-3 text-center">
+                    <button onclick="removeRow(this)" class="bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/40 transition">삭제</button>
+                </td>
+            `;
+        tbody.appendChild(tr);
+      }
+
+      function removeRow(btn) {
+        btn.closest("tr").remove();
+        const rows = document.querySelectorAll("#dh-body tr");
+        rowCount = 0;
+        rows.forEach((row) => {
+          rowCount++;
+          row.querySelector("td:first-child").innerText = rowCount;
+        });
+      }
+
+      function matrixToHTML(title, matrix) {
+        let html = `<div class="bg-gray-800 p-5 rounded-lg shadow-xl border border-gray-700 overflow-x-auto">
+                        <h3 class="text-xl font-bold text-yellow-300 mb-4 whitespace-nowrap">${title}</h3>`;
+        html += `<table class="matrix-table w-full text-center border-collapse">`;
+        for (let i = 0; i < 4; i++) {
+          html += `<tr>`;
+          for (let j = 0; j < 4; j++) {
+            html += `<td class="border border-gray-600 p-4 font-mono text-gray-200 whitespace-nowrap text-lg">${polyToString(matrix[i][j])}</td>`;
+          }
+          html += `</tr>`;
+        }
+        html += `</table></div>`;
+        return html;
+      }
+
+      function calculate() {
+        const rows = document.querySelectorAll("#dh-body tr");
+        const outputDiv = document.getElementById("output");
+
+        if (rows.length === 0) {
+          outputDiv.innerHTML =
+            '<p class="text-red-400 text-lg">⚠️ 입력된 파라미터가 없습니다. 행을 추가해주세요.</p>';
+          return;
+        }
+
+        let matrices = [];
+        let htmlOutput = "";
+
+        rows.forEach((row, i) => {
+          const inputs = row.querySelectorAll("input");
+          let alpha = formatSymbol(inputs[0].value);
+          let a = formatSymbol(inputs[1].value);
+          let d = formatSymbol(inputs[2].value);
+          let theta = formatSymbol(inputs[3].value);
+
+          inputs[0].value = alpha;
+          inputs[1].value = a;
+          inputs[2].value = d;
+          inputs[3].value = theta;
+
+          let T = getSymbolicDHMatrix(
+            alpha || "0",
+            a || "0",
+            d || "0",
+            theta || "0",
+          );
+          matrices.push(T);
+          htmlOutput += matrixToHTML(`T<sub>${i + 1}</sub> (Link ${i + 1})`, T);
+        });
+
+        if (matrices.length > 0) {
+          let T_total = matrices[0];
+          for (let i = 1; i < matrices.length; i++) {
+            T_total = multiplySymbolicMatrices(T_total, matrices[i]);
+          }
+
+          let equationName = Array.from(
+            { length: matrices.length },
+            (_, i) => `T<sub>${i + 1}</sub>`,
+          ).join(" &times; ");
+          htmlOutput += `<div class="mt-12"></div>`;
+          htmlOutput += matrixToHTML(
+            `최종 변환 행렬 (${equationName})`,
+            T_total,
+          );
+        }
+
+        outputDiv.innerHTML = htmlOutput;
+      }
+
+      window.onload = () => {
+        addRow("0", "0", "0", "theta1");
+        addRow("pi/2", "l1", "0", "theta2");
+        addRow("0", "l2", "0", "theta3");
+        addRow("0", "l3", "0", "0"); // EE (End-Effector)
+        calculate();
+      };
+    </script>
+  </body>
+</html>

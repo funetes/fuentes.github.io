@@ -167,13 +167,19 @@
             id="btn-mode-b"
             class="flex-1 py-1 px-1 rounded-md bg-white shadow font-semibold text-blue-600 transition-all"
           >
-            점 P를 Frame B에 고정
+            점 P를 Frame B에 고정<br /><span
+              class="text-[10px] font-normal text-gray-500"
+              >(수식 관점)</span
+            >
           </button>
           <button
             id="btn-mode-a"
             class="flex-1 py-1 px-1 rounded-md text-gray-500 hover:text-gray-700 transition-all"
           >
-            점 P를 우주공간에 고정
+            점 P를 우주공간에 고정<br /><span
+              class="text-[10px] font-normal text-gray-500"
+              >(관찰자 관점)</span
+            >
           </button>
         </div>
       </div>
@@ -442,7 +448,6 @@
         const cVal = `<span class="text-blue-700">${c}</span>`;
         const sVal = `<span class="text-red-600">${s}</span>`;
         const msVal = `<span class="text-red-600">${ms}</span>`;
-        const zVal = `<span class="text-gray-400">0.00</span>`;
 
         let eq, mat;
 
@@ -529,7 +534,7 @@
           .copy(isPointFixedToB ? pB_three : pA_three)
           .add(new THREE.Vector3(0.3, 0.3, 0));
 
-        // 3. 투영선 그리기 (선택된 축에 직교하는 평면의 두 축으로 선 그리기)
+        // 3. 투영선 그리기
         const pB_diag = toDiag(pB_three);
         const pA_diag = toDiag(pA_three);
 
@@ -555,8 +560,14 @@
         setProjectionLines([lines.b1, lines.b2], pB_diag);
         setProjectionLines([lines.a1, lines.a2], pA_diag);
 
-        // 4. 회전 호 (Arc) 그리기
-        if (arcMesh) scene.remove(arcMesh);
+        // 4. 회전 호 (Arc) 그리기 (이전 궤도 완전히 지우기 버그 수정 완료)
+        if (arcMesh) {
+          if (arcMesh.parent) arcMesh.parent.remove(arcMesh);
+          arcMesh.geometry.dispose();
+          arcMesh.material.dispose();
+          arcMesh = null;
+        }
+
         if (thetaRad !== 0) {
           let r, baseAngle;
           const pFixed_diag = toDiag(
@@ -733,8 +744,10 @@
       }
 
       // 초기화
-      setAxis("x");
-      animate();
+      window.onload = function () {
+        setAxis("x");
+        animate();
+      };
     </script>
   </body>
 </html>
