@@ -155,18 +155,3 @@
     height: 1px;
   }
 }
-
-/* LaTeX 수식 반응형 처리 */
-.MathJax_Display,
-.katex-display,
-.equation {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 10px;
-}
-
-.MathJax_Display table,
-.katex-display .katex-html table {
-  width: auto !important;
-  max-width: none !important;
-}
