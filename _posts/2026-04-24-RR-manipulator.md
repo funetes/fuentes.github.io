@@ -82,9 +82,9 @@ $$
 
 $\theta^`_i$ 는 $\theta_1$ + $\alpha$ - $\frac{\pi}{2}$ 로 나타낼수 있다,
 
-cos( $\theta_1$ + $\alpha$ - $\frac{\pi}{2}$) , sin( $\theta_1$ + $\alpha$ - $\frac{\pi}{2}$) 을 [[덧셈정리]]를 이용하여 정리하면,
+cos($\theta_1$ + $\alpha$ - $\frac{\pi}{2}$) , sin($\theta_1$ + $\alpha$ - $\frac{\pi}{2}$) 을 [[덧셈정리]]를 이용하여 정리하면,
 
-cos$\theta^`_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^`_i$ = -cos($\theta_1$ + $\alpha$) 가 된다.
+cos($\theta^`_i$) = sin($\theta_1$ + $\alpha$) , sin($\theta^`_i$) = -cos($\theta_1$ + $\alpha$) 가 된다.
 
 정리하면 $^0_1T$ 는
 
@@ -124,7 +124,7 @@ $$
 \end{bmatrix}
 $$
 
-cos$\theta^`_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^`_i$ = -cos($\theta_1$ + $\alpha$) 가 된다.
+cos($\theta^`_i$) = sin($\theta_1$ + $\alpha$) , sin($\theta^`_i$) = -cos($\theta_1$ + $\alpha$) 가 된다.
 
 $$
 = \begin{bmatrix}
