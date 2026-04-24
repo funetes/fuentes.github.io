@@ -1,3 +1,9 @@
+---
+layout: post
+title: "DH parameter"
+date: 2026-03-27 12:00:00 +0900
+---
+
 # DH Parameter 계산기
 
 ## standard DH parameter
