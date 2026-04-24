@@ -38,7 +38,7 @@ tags:
    $$
 
 $$
-=
+^{i-1}_iT =
 \begin{bmatrix} C{\theta_i} & -S{\theta_i} & 0 & 0 \\ S{\theta_i} & C{\theta_i} & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1
 \end{bmatrix}
 \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & d_i \\ 0 & 0 & 0 & 1
@@ -62,15 +62,10 @@ $$
 
 $$
 ^0_1T = \begin{bmatrix}
-
 \cos \theta^`_{i} & -\sin\theta^`_{i} \cos (-\frac{\pi}{2}) & \sin \theta^`_{i} \sin (-\frac{\pi}{2}) & a_{i} \cos \theta^`_{i} \\
-
 \sin \theta^`_{i} & \cos \theta^`_{i} \cos (-\frac{\pi}{2}) & -\cos \theta^`_{i} \sin (-\frac{\pi}{2}) & a_{i} \sin \theta^`_{i} \\
-
 0 & \sin (-\frac{\pi}{2}) & \cos (-\frac{\pi}{2}) & d_{i} \\
-
 0 & 0 & 0 & 1
-
 \end{bmatrix}
 $$
 
@@ -78,15 +73,10 @@ $\cos (-\frac{\pi}{2})$ = $0$, $\sin (-\frac{\pi}{2})$ = $-1$ 이므로,
 
 $$
 ^0_1T = \begin{bmatrix}
-
 \cos \theta^`_{i} & 0 & -\sin \theta^`_{i} & a_{i} \cos \theta^`_{i} \\
-
 \sin \theta^`_{i} & 0 & \cos \theta^`_{i} & a_{i} \sin \theta^`_{i} \\
-
 0 & -1 & 0 & 0 \\
-
 0 & 0 & 0 & 1
-
 \end{bmatrix}
 $$
 
@@ -100,15 +90,10 @@ cos$\theta^`_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^`_i$ = -cos($\theta_1$
 
 $$
 ^0_1T = \begin{bmatrix}
-
 sin(\theta_1 + \alpha) & 0 & -cos(\theta_1 + \alpha)  & a_{i} sin(\theta_1 + \alpha) \\
-
 -cos(\theta_1 + \alpha) & 0 & sin(\theta_1 + \alpha) & -a_{i} cos(\theta_1 + \alpha) \\
-
 0 & -1 & 0 & 0 \\
-
 0 & 0 & 0 & 1
-
 \end{bmatrix}
 $$
 
@@ -126,15 +111,10 @@ $$
 $$
 ^0_1T^1_2T =
 \begin{bmatrix}
-
 \cos \theta^`_{i} & 0 & -\sin \theta^`_{i} & a_{i} \cos \theta^`_{i} \\
-
 \sin \theta^`_{i} & 0 & \cos \theta^`_{i} & a_{i} \sin \theta^`_{i} \\
-
 0 & -1 & 0 & 0 \\
-
 0 & 0 & 0 & 1
-
 \end{bmatrix}
 \begin{bmatrix}
 1 & 0 & 0 & 0 \\
@@ -148,15 +128,10 @@ cos$\theta^`_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^`_i$ = -cos($\theta_1$
 
 $$
 = \begin{bmatrix}
-
 \sin(\theta_1 + \alpha) & 0 & \cos(\theta_1 + \alpha) & \cos(\theta_1 + \alpha)+l_1\sin{\alpha}\sin(\theta_1 + \alpha) \\
-
 -\cos(\theta_1 + \alpha) & 0 & \sin(\theta_1 + \alpha) & \sin(\theta_1 + \alpha)d_2 - l_1\sin{\alpha}\cos(\theta_1 + \alpha) \\
-
 0 & -1 & 0 & 0 \\
-
 0 & 0 & 0 & 1
-
 \end{bmatrix}
 $$
 
@@ -264,15 +239,10 @@ $$
 
 $$
 = \begin{bmatrix}
-
 \sin(\theta_1 + \alpha) & 0 & \cos(\theta_1 + \alpha) & \cos(\theta_1 + \alpha)d_2+l_1\sin{\alpha}\sin(\theta_1 + \alpha) \\
-
 -\cos(\theta_1 + \alpha) & 0 & \sin(\theta_1 + \alpha) & \sin(\theta_1 + \alpha)d_2 - l_1\sin{\alpha}\cos(\theta_1 + \alpha) \\
-
 0 & -1 & 0 & 0 \\
-
 0 & 0 & 0 & 1
-
 \end{bmatrix}
 $$
 
