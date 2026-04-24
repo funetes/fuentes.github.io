@@ -22,20 +22,26 @@ tags:
 
 ## DH parameter - standard
 
-1. DH Table
-   #Realize
-   stadard way는 1부터 (이전 축 안봄)
+### DH Table
+
+#Realize standard는 1부터 (이전 축 안봄)
+
+<div align="center">
 
 | i       | $\alpha_{i}$     | $a_{i}$            | $\theta_{i}$ | $d_{i}$ |
 | ------- | ---------------- | ------------------ | ------------ | ------- |
 | 1: 1~2  | -$\frac{\pi}{2}$ | $l_{1}Sin(\alpha)$ | $\theta^ʹ_1$ | 0       |
 | 2: 2~EE | 0                | 0                  | 0            | $d_2$   |
 
-2. 일반식
-   #Realize Z축 부터 변환한 후 X축 변환
-   $$
-   ^{i-1}_iT = R_z(\theta_i)T_z(d_i)T_x(a_i)R_x(\alpha_i)
-   $$
+</div>
+
+### 일반식
+
+#Realize Z축 부터 변환한 후 X축 변환
+
+$$
+^{i-1}_iT = R_z(\theta_i)T_z(d_i)T_x(a_i)R_x(\alpha_i)
+$$
 
 $$
 ^{i-1}_iT =
@@ -58,7 +64,7 @@ $$
 \end{bmatrix}
 $$
 
-3. 변환행렬 계산 $^0T_1$ ~ $^1T_2$
+### 변환행렬 계산 $^0T_1$ ~ $^1T_2$
 
 $$
 ^0_1T = \begin{bmatrix}
@@ -137,16 +143,22 @@ $$
 
 ## D-H Modified Way
 
-1. DH Table
-   #Realize modified way는 0부터
+### DH Table
+
+#Realize modified way는 0부터
+
+<div align="center">
 
 | i   | $\alpha_{i-1}$   | $a_{i-1}$       | $\theta_i$   | $d_i$ |
 | --- | ---------------- | --------------- | ------------ | ----- |
 | 1   | 0                | 0               | $\theta^ʹ_1$ | 0     |
 | 2   | $-\frac{\pi}{2}$ | $l_1\sin\alpha$ | 0            | $d_2$ |
 
-2. 일반식
-   #Realize X축 부터 변환한 후 Z축 변환
+</div>
+
+### 일반식
+
+#Realize X축 부터 변환한 후 Z축 변환
 
 $$
 ^{i-1}_iT = R_x(\alpha_{i-1})T_x(a_{i-1})R_z({\theta}_i)T_z(d_i)
@@ -188,16 +200,17 @@ S{\theta_i}S{\alpha_{i-1}} & C{\theta_i}S{\alpha_{i-1}} & C{\alpha_{i-1}} & d_iC
 \end{bmatrix}
 $$
 
-3. 변환행렬 도출
-   $$
-   ^0_1T=
-   \begin{bmatrix}
-   C{\theta^ʹ_1} & -S{\theta^ʹ_1} & 0 & 0 \\
-   S{\theta^ʹ_1} & C{\theta^ʹ_1} & 0 & 0 \\
-   0 & 0 & 1 & 0 \\
-   0 & 0 & 0 & 1 \\
-   \end{bmatrix}
-   $$
+### 변환행렬 도출
+
+$$
+^0_1T=
+\begin{bmatrix}
+C{\theta^ʹ_1} & -S{\theta^ʹ_1} & 0 & 0 \\
+S{\theta^ʹ_1} & C{\theta^ʹ_1} & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{bmatrix}
+$$
 
 cos$\theta^ʹ_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^ʹ_i$ = -cos($\theta_1$ + $\alpha$) 가 된다. [[덧셈정리]]
 
@@ -245,6 +258,8 @@ $$
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
+
+## kinematics 도출
 
 최종 end-effector의 위치
 
