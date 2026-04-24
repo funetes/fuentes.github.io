@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Standard DH 심볼릭 계산기</title>
+    <title>Standard DH 심볼릭 계산기 (덧셈/차 공식 강화)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- MathJax 렌더링 라이브러리 추가 -->
     <script>
       window.MathJax = {
         tex: {
           inlineMath: [["\\(", "\\)"]],
           displayMath: [["$$", "$$"]],
         },
+        svg: { fontCache: "global" },
       };
     </script>
     <script
@@ -21,87 +21,156 @@
     ></script>
     <style>
       body {
-        font-family: "Consolas", "Courier New", monospace;
+        font-family:
+          "Pretendard",
+          system-ui,
+          -apple-system,
+          sans-serif;
       }
-      .matrix-table td {
-        min-width: 80px;
+      .math-container::-webkit-scrollbar {
+        height: 8px;
+      }
+      .math-container::-webkit-scrollbar-thumb {
+        background: #4b5563;
+        border-radius: 4px;
+      }
+      input::placeholder {
+        color: #6b7280;
+        font-size: 0.875rem;
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-gray-200 p-8 min-h-screen">
+  <body class="bg-gray-900 text-gray-100 min-h-screen p-4 md:p-8">
     <div class="max-w-6xl mx-auto">
-      <h1 class="text-3xl font-bold text-blue-400 mb-6">
-        Standard DH 심볼릭 계산기
-      </h1>
+      <header class="mb-8 border-b border-gray-700 pb-4">
+        <h1 class="text-3xl font-bold text-blue-400">
+          Standard DH 심볼릭 계산기
+        </h1>
+        <p class="text-gray-400 mt-2">
+          삼각함수 덧셈/차 공식($C_{1-3}$, $S_{1+2}$) 및 음각 공식 자동 처리
+        </p>
+      </header>
 
-      <div class="bg-gray-800 rounded-lg p-6 mb-8 shadow-lg">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold text-green-400">
-            Standard DH 파라미터 입력 표
+      <!-- 입력 섹션 -->
+      <div
+        class="bg-gray-800 rounded-xl p-6 shadow-2xl mb-8 border border-gray-700"
+      >
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+          <h2 class="text-xl font-semibold text-green-400 flex items-center">
+            <span class="mr-2">📋</span> DH 파라미터 입력 표
           </h2>
-          <div class="space-x-2">
+          <div class="flex gap-2">
             <button
               onclick="addRow()"
-              class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition"
+              class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition text-sm"
             >
               행 추가 (+)
             </button>
             <button
               onclick="calculate()"
-              class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded transition font-bold"
+              class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg transition font-bold shadow-lg"
             >
               행렬 계산하기
             </button>
           </div>
         </div>
 
-        <p class="text-sm text-gray-400 mb-4">
-          💡 <strong>입력 팁:</strong>
-          <code class="bg-gray-700 px-1 rounded">pi/2</code>,
-          <code class="bg-gray-700 px-1 rounded">theta1</code>,
-          <code class="bg-gray-700 px-1 rounded">l1</code> 등으로 입력하면
-          기호(π/2, θ₁, l₁)로 자동 변환됩니다. <br />
-          💡 각도 θ에 대해서는 행렬의 가독성을 위해
-          <code class="bg-gray-700 px-1 rounded">C₁</code>,
-          <code class="bg-gray-700 px-1 rounded">S₁</code> 로 축약
-          표시됩니다.<br />
-          ✨ <strong>스마트 연산:</strong> 행렬 곱셈 시
-          <code class="bg-gray-700 px-1 rounded">C₁C₂ - S₁S₂</code> 와 같은 식은
-          삼각함수 덧셈정리에 의해 자동으로
-          <code class="bg-gray-700 px-1 rounded">C₁₂</code> 로 압축됩니다.
-        </p>
-
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+          <table class="w-full text-left">
             <thead>
-              <tr class="bg-gray-700 text-gray-300">
-                <th class="p-3 border-b border-gray-600 text-center w-12">i</th>
-                <!-- Standard DH에 맞게 컬럼 헤더 변경 -->
-                <th class="p-3 border-b border-gray-600">αᵢ (Alpha)</th>
-                <th class="p-3 border-b border-gray-600">aᵢ (Link Length)</th>
-                <th class="p-3 border-b border-gray-600">dᵢ (Link Offset)</th>
-                <th class="p-3 border-b border-gray-600">θᵢ (Joint Angle)</th>
-                <th class="p-3 border-b border-gray-600 text-center w-24">
-                  관리
-                </th>
+              <tr class="text-gray-400 border-b border-gray-700 text-sm">
+                <th class="pb-3 pl-2 w-12 text-center">i</th>
+                <th class="pb-3 px-2">$\alpha_{i-1}$ (Alpha)</th>
+                <th class="pb-3 px-2">$a_{i-1}$ (Link Length)</th>
+                <th class="pb-3 px-2">$d_i$ (Link Offset)</th>
+                <th class="pb-3 px-2">$\theta_i$ (Joint Angle)</th>
+                <th class="pb-3 pr-2 w-20 text-center">작업</th>
               </tr>
             </thead>
-            <tbody id="dh-body">
-              <!-- 행이 JavaScript를 통해 동적으로 추가됩니다 -->
+            <tbody id="dh-body" class="divide-y divide-gray-700">
+              <!-- JS로 행 추가 -->
             </tbody>
           </table>
         </div>
+
+        <div
+          class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-400 bg-gray-900/50 p-4 rounded-lg"
+        >
+          <div>
+            <p class="font-bold text-gray-300 mb-1">💡 입력 도움말</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>
+                <code class="text-blue-300">pi/2</code> → $\pi/2$,
+                <code class="text-blue-300">-theta1</code> → $-\theta_1$
+              </li>
+              <li>음수 각도 입력 시 자동으로 음각 공식이 적용됩니다.</li>
+            </ul>
+          </div>
+          <div>
+            <p class="font-bold text-gray-300 mb-1">
+              ✨ 지능형 덧셈정리 (강화됨)
+            </p>
+            <ul class="list-disc list-inside space-y-1 text-green-300/80">
+              <li>$C_1 C_3 + S_1 S_3 \to C_{1-3}$ (코사인 차)</li>
+              <li>$S_1 C_3 - C_1 S_3 \to S_{1-3}$ (사인 차)</li>
+              <li>모든 조합($\pm$)에 대한 삼각함수 합성을 지원합니다.</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-      <div id="output" class="space-y-8">
-        <!-- 행렬 결과가 여기에 표시됩니다. -->
+      <!-- 결과 출력 -->
+      <div id="output" class="space-y-6">
+        <!-- 결과 행렬들이 여기에 생성됨 -->
       </div>
     </div>
 
     <script>
       // ==========================================
-      // 다항식 기반의 심볼릭 수학 연산 엔진 (CAS)
+      // CAS (Computer Algebra System) 엔진
       // ==========================================
+
+      const subsMap = {
+        0: "₀",
+        1: "₁",
+        2: "₂",
+        3: "₃",
+        4: "₄",
+        5: "₅",
+        6: "₆",
+        7: "₇",
+        8: "₈",
+        9: "₉",
+        "-": "₋",
+        "+": "₊",
+      };
+      const revSubsMap = {
+        "₀": "0",
+        "₁": "1",
+        "₂": "2",
+        "₃": "3",
+        "₄": "4",
+        "₅": "5",
+        "₆": "6",
+        "₇": "7",
+        "₈": "8",
+        "₉": "9",
+        "₋": "-",
+        "₊": "+",
+      };
+
+      function toSub(str) {
+        return str
+          .split("")
+          .map((c) => subsMap[c] || c)
+          .join("");
+      }
+      function fromSub(str) {
+        return str
+          .split("")
+          .map((c) => revSubsMap[c] || c)
+          .join("");
+      }
 
       function formatSymbol(val) {
         if (!val) return "";
@@ -110,68 +179,51 @@
           .replace(/theta/gi, "θ")
           .replace(/alpha/gi, "α")
           .replace(/pi/gi, "π");
-        v = v.replace(/([a-zA-Zθαπ])(\d+)/g, (match, p1, p2) => {
-          const subs = {
-            0: "₀",
-            1: "₁",
-            2: "₂",
-            3: "₃",
-            4: "₄",
-            5: "₅",
-            6: "₆",
-            7: "₇",
-            8: "₈",
-            9: "₉",
-          };
-          let subStr = p2
-            .split("")
-            .map((char) => subs[char])
-            .join("");
-          return p1 + subStr;
-        });
+        v = v.replace(/([a-zA-Zθαπ])(\d+)/g, (m, p1, p2) => p1 + toSub(p2));
         return v;
-      }
-
-      // 항(Term) 내부의 문자들을 정렬 (상수/길이가 앞, 삼각함수가 뒤로 오도록)
-      function sortParts(parts) {
-        return parts.sort((a, b) => {
-          let aIsTrig = /^[CS][₀-₉]+$/.test(a);
-          let bIsTrig = /^[CS][₀-₉]+$/.test(b);
-          if (aIsTrig && !bIsTrig) return 1;
-          if (!aIsTrig && bIsTrig) return -1;
-          return a.localeCompare(b);
-        });
       }
 
       function stringToPoly(str) {
         if (!str || str === "0") return [];
         if (str === "1") return [{ val: 1, parts: [] }];
         if (str === "-1") return [{ val: -1, parts: [] }];
-
         let sign = 1;
-        if (str.startsWith("-")) {
+        let s = str;
+        if (s.startsWith("-")) {
           sign = -1;
-          str = str.substring(1).trim();
+          s = s.substring(1).trim();
         }
-        if (str === "1") return [{ val: sign, parts: [] }];
-        return [{ val: sign, parts: [str] }];
+        return [{ val: sign, parts: [s] }];
       }
 
       function getTrigPoly(func, val) {
         let v = val.toLowerCase().replace(/\s/g, "");
-        if (v === "0") return func === "cos" ? stringToPoly("1") : [];
-        if (v === "90" || v === "π/2")
-          return func === "cos" ? [] : stringToPoly("1");
-        if (v === "-90" || v === "-π/2")
-          return func === "cos" ? [] : stringToPoly("-1");
-        if (v === "180" || v === "π")
-          return func === "cos" ? stringToPoly("-1") : [];
+        let signMultiplier = 1;
 
-        let match = val.match(/^θ([₀-₉]+)$/);
-        if (match) {
-          return stringToPoly(func === "cos" ? `C${match[1]}` : `S${match[1]}`);
+        if (v.startsWith("-")) {
+          if (func === "sin") signMultiplier = -1;
+          v = v.substring(1);
         }
-        return stringToPoly(`${func}(${val})`);
+
+        if (v === "0")
+          return func === "cos" ? [{ val: signMultiplier, parts: [] }] : [];
+        if (v === "90" || v === "π/2")
+          return func === "cos" ? [] : [{ val: signMultiplier, parts: [] }];
+        if (v === "180" || v === "π")
+          return func === "cos" ? [{ val: -signMultiplier, parts: [] }] : [];
+        if (v === "270" || v === "3π/2")
+          return func === "cos" ? [] : [{ val: -signMultiplier, parts: [] }];
+
+        let match = v.match(/^θ([₀-₉]+)$/);
+        if (match) {
+          return [
+            {
+              val: signMultiplier,
+              parts: [(func === "cos" ? "C" : "S") + match[1]],
+            },
+          ];
+        }
+        return [{ val: signMultiplier, parts: [`${func}(${v})`] }];
       }
 
       function multPolys(p1, p2) {
@@ -179,140 +231,126 @@
         let res = [];
         for (let t1 of p1) {
           for (let t2 of p2) {
-            let parts = [...t1.parts, ...t2.parts].filter((p) => p !== "1");
-            res.push({ val: t1.val * t2.val, parts: parts });
+            let newParts = [...t1.parts, ...t2.parts].filter((p) => p !== "1");
+            res.push({ val: t1.val * t2.val, parts: newParts.sort() });
           }
         }
         return res;
       }
 
-      function addPolys(...polys) {
-        let res = [];
-        for (let p of polys) res.push(...p);
-        return res;
+      function addPolys(p1, p2) {
+        return [...p1, ...p2];
       }
 
-      // 첨자(아래첨자) 정규화 도구: '₁₂'와 '₃'이 만나면 '₁₂₃'으로 정렬
-      function normalizeIdx(str1, str2) {
-        return (str1 + str2).split("").sort().join("");
-      }
-
-      // 다항식 정리 및 덧셈정리 적용의 핵심 함수
       function simplifyPoly(poly) {
-        // 1단계: 동류항 묶기 (부호가 다르면 상쇄)
+        if (poly.length === 0) return [];
+
         let groups = {};
         for (let t of poly) {
-          t.parts = sortParts(t.parts);
-          let key = t.parts.join(" ");
-          if (!groups[key]) groups[key] = 0;
-          groups[key] += t.val;
+          let key = t.parts.sort().join("|");
+          groups[key] = (groups[key] || 0) + t.val;
         }
-
         let terms = [];
         for (let key in groups) {
-          if (groups[key] !== 0)
-            terms.push({ val: groups[key], parts: key ? key.split(" ") : [] });
+          if (Math.abs(groups[key]) > 0.0001) {
+            terms.push({ val: groups[key], parts: key ? key.split("|") : [] });
+          }
         }
 
-        // 2단계: 삼각함수 덧셈정리 적용
         let changed = true;
         while (changed) {
           changed = false;
           for (let i = 0; i < terms.length; i++) {
-            if (terms[i].val === 0) continue;
-            for (let j = i + 1; j < terms.length; j++) {
-              if (terms[j].val === 0) continue;
+            for (let j = 0; j < terms.length; j++) {
+              if (i === j || terms[i].val === 0 || terms[j].val === 0) continue;
 
               let t1 = terms[i],
                 t2 = terms[j];
+              let nonTrig1 = t1.parts.filter((p) => !/^[CS][₀-₉]+$/.test(p));
+              let nonTrig2 = t2.parts.filter((p) => !/^[CS][₀-₉]+$/.test(p));
+              if (nonTrig1.join("|") !== nonTrig2.join("|")) continue;
 
-              // 상호 계수(trig가 아닌 부분)가 일치해야 묶을 수 있음
-              let c1 = t1.parts
-                .filter((p) => !/^[CS][₀-₉]+$/.test(p))
-                .join(" ");
-              let c2 = t2.parts
-                .filter((p) => !/^[CS][₀-₉]+$/.test(p))
-                .join(" ");
-              if (c1 !== c2) continue;
+              let trigs1 = t1.parts.filter((p) => /^[CS][₀-₉]+$/.test(p));
+              let trigs2 = t2.parts.filter((p) => /^[CS][₀-₉]+$/.test(p));
 
-              let tr1 = t1.parts.filter((p) => /^[CS][₀-₉]+$/.test(p));
-              let tr2 = t2.parts.filter((p) => /^[CS][₀-₉]+$/.test(p));
+              if (trigs1.length >= 2 && trigs2.length >= 2) {
+                let common = trigs1.filter((p) => trigs2.includes(p));
+                let rem1 = trigs1.filter((p) => !common.includes(p));
+                let rem2 = trigs2.filter((p) => !common.includes(p));
 
-              // 공통 삼각함수 추출
-              let commonTrigs = [],
-                rem1 = [...tr1],
-                rem2 = [...tr2];
-              for (let k = rem1.length - 1; k >= 0; k--) {
-                let idx = rem2.indexOf(rem1[k]);
-                if (idx !== -1) {
-                  commonTrigs.push(rem1[k]);
-                  rem1.splice(k, 1);
-                  rem2.splice(idx, 1);
-                }
-              }
+                if (rem1.length === 2 && rem2.length === 2) {
+                  let matchFound = false;
+                  let newTrig = "";
+                  let newSign = 1;
 
-              if (
-                rem1.length === 2 &&
-                rem2.length === 2 &&
-                Math.abs(t1.val) === Math.abs(t2.val)
-              ) {
-                let r1_C = rem1.every((x) => x.startsWith("C"));
-                let r1_S = rem1.every((x) => x.startsWith("S"));
-                let r2_C = rem2.every((x) => x.startsWith("C"));
-                let r2_S = rem2.every((x) => x.startsWith("S"));
+                  let aIdx = fromSub(rem1[0].substring(1));
+                  let bIdx = fromSub(rem1[1].substring(1));
+                  let cIdx = fromSub(rem2[0].substring(1));
+                  let dIdx = fromSub(rem2[1].substring(1));
 
-                // [Cosine 덧셈정리] C_a C_b - S_a S_b = C_{ab}
-                if ((r1_C && r2_S) || (r1_S && r2_C)) {
-                  let c_rem = r1_C ? rem1 : rem2;
-                  let s_rem = r1_S ? rem1 : rem2;
-                  let c_val = r1_C ? t1.val : t2.val;
-                  let s_val = r1_S ? t1.val : t2.val;
+                  // 두 항에 사용된 인덱스가 동일해야 함
+                  let set1 = [aIdx, bIdx].sort().join(",");
+                  let set2 = [cIdx, dIdx].sort().join(",");
 
-                  let c_idx = normalizeIdx(
-                    c_rem[0].substring(1),
-                    c_rem[1].substring(1),
-                  );
-                  let s_idx = normalizeIdx(
-                    s_rem[0].substring(1),
-                    s_rem[1].substring(1),
-                  );
+                  if (set1 === set2) {
+                    let [idxA, idxB] = [aIdx, bIdx];
 
-                  if (c_idx === s_idx && c_val === -s_val) {
-                    terms[i].val = c_val;
-                    terms[i].parts = sortParts([
-                      ...c1.split(" ").filter(Boolean),
-                      ...commonTrigs,
-                      "C" + c_idx,
-                    ]);
-                    terms[j].val = 0;
-                    changed = true;
-                    break;
+                    // 1. 코사인 계열 (CaCb와 SaSb의 결합)
+                    if (
+                      rem1.every((p) => p[0] === "C") &&
+                      rem2.every((p) => p[0] === "S")
+                    ) {
+                      if (t1.val === -t2.val) {
+                        // CaCb - SaSb = C(a+b)
+                        newTrig = "C" + toSub(idxA + "+" + idxB);
+                        newSign = t1.val;
+                        matchFound = true;
+                      } else if (t1.val === t2.val) {
+                        // CaCb + SaSb = C(a-b)
+                        newTrig = "C" + toSub(idxA + "-" + idxB);
+                        newSign = t1.val;
+                        matchFound = true;
+                      }
+                    }
+                    // 2. 사인 계열 (SaCb와 CaSb의 결합)
+                    else if (
+                      rem1.some((p) => p[0] === "S") &&
+                      rem2.some((p) => p[0] === "S")
+                    ) {
+                      let sTerm = rem1.find((p) => p[0] === "S") ? t1 : t2;
+                      let cTerm = rem1.find((p) => p[0] === "S") ? t2 : t1;
+                      let sIdx = fromSub(
+                        rem1.find((p) => p[0] === "S")
+                          ? rem1.find((p) => p[0] === "S").substring(1)
+                          : rem2.find((p) => p[0] === "S").substring(1),
+                      );
+                      let otherIdx = idxA === sIdx ? idxB : idxA;
+
+                      if (t1.val === t2.val) {
+                        // SaCb + CaSb = S(a+b)
+                        newTrig = "S" + toSub(sIdx + "+" + otherIdx);
+                        newSign = t1.val;
+                        matchFound = true;
+                      } else if (t1.val === -t2.val) {
+                        // SaCb - CaSb = S(a-b)
+                        // 계수가 양수인 쪽의 S의 인덱스가 앞
+                        let sPosIdx =
+                          t1.val > 0 && rem1.some((p) => p[0] === "S")
+                            ? sIdx
+                            : t2.val > 0 && rem2.some((p) => p[0] === "S")
+                              ? sIdx
+                              : otherIdx;
+                        let sNegIdx = sPosIdx === sIdx ? otherIdx : sIdx;
+                        newTrig = "S" + toSub(sPosIdx + "-" + sNegIdx);
+                        newSign = Math.abs(t1.val);
+                        matchFound = true;
+                      }
+                    }
                   }
-                }
 
-                // [Sine 덧셈정리] S_a C_b + C_a S_b = S_{ab}
-                let s1_p = rem1.find((x) => x.startsWith("S")),
-                  c1_p = rem1.find((x) => x.startsWith("C"));
-                let s2_p = rem2.find((x) => x.startsWith("S")),
-                  c2_p = rem2.find((x) => x.startsWith("C"));
-                if (s1_p && c1_p && s2_p && c2_p) {
-                  let s1_idx = s1_p.substring(1),
-                    c1_idx = c1_p.substring(1);
-                  let s2_idx = s2_p.substring(1),
-                    c2_idx = c2_p.substring(1);
-
-                  if (
-                    s1_idx === c2_idx &&
-                    c1_idx === s2_idx &&
-                    t1.val === t2.val
-                  ) {
-                    let idx_str = normalizeIdx(s1_idx, c1_idx);
-                    terms[i].val = t1.val;
-                    terms[i].parts = sortParts([
-                      ...c1.split(" ").filter(Boolean),
-                      ...commonTrigs,
-                      "S" + idx_str,
-                    ]);
+                  if (matchFound) {
+                    terms[i].val = newSign;
+                    terms[i].parts = [...nonTrig1, ...common, newTrig].sort();
                     terms[j].val = 0;
                     changed = true;
                     break;
@@ -327,287 +365,208 @@
         return terms;
       }
 
-      // 다항식을 문자열로 출력
       function polyToString(poly) {
         if (poly.length === 0) return "0";
         let res = "";
-        for (let i = 0; i < poly.length; i++) {
-          let t = poly[i];
-          let valAbs = Math.abs(t.val);
-          let signStr = t.val < 0 ? "-" : "+";
-          let partsStr = t.parts.join(" ");
-
-          if (i === 0) {
-            if (t.val < 0) res += "-";
-            if (valAbs !== 1 || partsStr === "")
-              res += valAbs + (partsStr ? " " : "");
-            res += partsStr;
-          } else {
-            res += ` ${signStr} `;
-            if (valAbs !== 1 || partsStr === "")
-              res += valAbs + (partsStr ? " " : "");
-            res += partsStr;
-          }
-        }
-        return res === "" ? "0" : res;
-      }
-
-      // ==========================================
-      // LaTeX (마크다운 수식) 변환기
-      // ==========================================
-      function polyToLaTeX(polyStr) {
-        const subs = {
-          "₀": "0",
-          "₁": "1",
-          "₂": "2",
-          "₃": "3",
-          "₄": "4",
-          "₅": "5",
-          "₆": "6",
-          "₇": "7",
-          "₈": "8",
-          "₉": "9",
-        };
-        let res = polyStr;
-
-        // 아래첨자 변환 (예: C₁₂ -> C_{12})
-        res = res.replace(/([₀-₉]+)/g, (match) => {
-          let digits = match
-            .split("")
-            .map((c) => subs[c])
-            .join("");
-          return `_{${digits}}`;
+        poly.forEach((t, i) => {
+          let absVal = Math.abs(t.val);
+          let sign = t.val > 0 ? (i === 0 ? "" : " + ") : i === 0 ? "-" : " - ";
+          let parts = t.parts.join("");
+          let coeff =
+            absVal === 1 && parts !== ""
+              ? ""
+              : Number.isInteger(absVal)
+                ? absVal
+                : absVal.toFixed(2);
+          res += sign + coeff + parts;
         });
-
-        // 특수 기호를 LaTeX 명령어로 변환
-        res = res
-          .replace(/π/g, "\\pi ")
-          .replace(/θ/g, "\\theta ")
-          .replace(/α/g, "\\alpha ");
-
-        // 공백을 얇은 공백으로 변경
         return res;
       }
 
+      function polyToLaTeX(str) {
+        if (str === "0") return "0";
+        return str
+          .replace(
+            /([CS])([₀-₉₋₊\-+]+)/g,
+            (m, p1, p2) => `${p1}_{${fromSub(p2)}}`,
+          )
+          .replace(
+            /([a-zA-Zαθπ])([₀-₉]+)/g,
+            (m, p1, p2) => `${p1}_{${fromSub(p2)}}`,
+          )
+          .replace(/π/g, "\\pi")
+          .replace(/θ/g, "\\theta")
+          .replace(/α/g, "\\alpha");
+      }
+
       // ==========================================
-      // 행렬 연산 (Standard DH 방식)
+      // 로봇 공학 연산 (Standard DH)
       // ==========================================
 
-      function getSymbolicDHMatrix(alpha, a, d, theta) {
+      function getDHMatrix(alpha, a, d, theta) {
         const ct = getTrigPoly("cos", theta);
         const st = getTrigPoly("sin", theta);
         const ca = getTrigPoly("cos", alpha);
         const sa = getTrigPoly("sin", alpha);
+        const a_p = stringToPoly(a);
+        const d_p = stringToPoly(d);
 
-        const a_poly = stringToPoly(a);
-        const d_poly = stringToPoly(d);
-        const neg_st = multPolys(stringToPoly("-1"), st);
-        const neg_ct = multPolys(stringToPoly("-1"), ct);
-
-        // Standard DH 행렬 구조
         return [
-          [ct, multPolys(neg_st, ca), multPolys(st, sa), multPolys(a_poly, ct)],
-          [st, multPolys(ct, ca), multPolys(neg_ct, sa), multPolys(a_poly, st)],
-          [[], sa, ca, d_poly],
-          [[], [], [], stringToPoly("1")],
+          [
+            ct,
+            multPolys(multPolys(st, [{ val: -1, parts: [] }]), ca),
+            multPolys(st, sa),
+            multPolys(a_p, ct),
+          ],
+          [
+            st,
+            multPolys(ct, ca),
+            multPolys(multPolys(ct, [{ val: -1, parts: [] }]), sa),
+            multPolys(a_p, st),
+          ],
+          [[], sa, ca, d_p],
+          [[], [], [], [{ val: 1, parts: [] }]],
         ];
       }
 
-      function multiplySymbolicMatrices(m1, m2) {
-        let result = Array(4)
+      function multiply(A, B) {
+        let C = Array(4)
           .fill(0)
-          .map(() => Array(4).fill([]));
+          .map(() =>
+            Array(4)
+              .fill(0)
+              .map(() => []),
+          );
         for (let i = 0; i < 4; i++) {
           for (let j = 0; j < 4; j++) {
-            let sumPoly = [];
+            let sum = [];
             for (let k = 0; k < 4; k++) {
-              let prod = multPolys(m1[i][k], m2[k][j]);
-              sumPoly = addPolys(sumPoly, prod);
+              sum = addPolys(sum, multPolys(A[i][k], B[k][j]));
             }
-            result[i][j] = simplifyPoly(sumPoly);
+            C[i][j] = simplifyPoly(sum);
           }
         }
-        return result;
+        return C;
       }
 
       // ==========================================
-      // UI 로직
+      // UI 제어
       // ==========================================
 
-      let rowCount = 0;
-
-      function addRow(alpha = "", a = "", d = "", theta = "") {
-        rowCount++;
+      let rowIdx = 0;
+      function addRow(al = "", a = "", d = "", th = "") {
+        rowIdx++;
         const tbody = document.getElementById("dh-body");
         const tr = document.createElement("tr");
-        tr.className = "border-b border-gray-700 hover:bg-gray-750 transition";
+        tr.className = "hover:bg-gray-750 transition-colors";
         tr.innerHTML = `
-                <td class="p-3 text-center font-bold text-gray-400">${rowCount}</td>
-                <td class="p-3"><input type="text" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-blue-500" value="${alpha}" placeholder="π/2, α1..."></td>
-                <td class="p-3"><input type="text" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-blue-500" value="${a}" placeholder="l1..."></td>
-                <td class="p-3"><input type="text" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-blue-500" value="${d}" placeholder="d1..."></td>
-                <td class="p-3"><input type="text" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-blue-500" value="${theta}" placeholder="θ1..."></td>
-                <td class="p-3 text-center">
-                    <button onclick="removeRow(this)" class="bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/40 transition">삭제</button>
+                <td class="py-4 text-center font-mono text-gray-500">${rowIdx}</td>
+                <td class="py-2 px-1"><input type="text" value="${al}" class="w-full bg-gray-700 border-none rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0"></td>
+                <td class="py-2 px-1"><input type="text" value="${a}" class="w-full bg-gray-700 border-none rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0"></td>
+                <td class="py-2 px-1"><input type="text" value="${d}" class="w-full bg-gray-700 border-none rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0"></td>
+                <td class="py-2 px-1"><input type="text" value="${th}" class="w-full bg-gray-700 border-none rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="theta${rowIdx}"></td>
+                <td class="py-2 text-center">
+                    <button onclick="this.parentElement.parentElement.remove(); updateIdx();" class="text-red-400 hover:text-red-300 p-1">✕</button>
                 </td>
             `;
         tbody.appendChild(tr);
       }
 
-      function removeRow(btn) {
-        btn.closest("tr").remove();
-        const rows = document.querySelectorAll("#dh-body tr");
-        rowCount = 0;
-        rows.forEach((row) => {
-          rowCount++;
-          row.querySelector("td:first-child").innerText = rowCount;
+      function updateIdx() {
+        document.querySelectorAll("#dh-body tr").forEach((tr, i) => {
+          tr.querySelector("td:first-child").innerText = i + 1;
         });
+        rowIdx = document.querySelectorAll("#dh-body tr").length;
       }
 
-      // ==========================================
-      // 클립보드 복사 기능
-      // ==========================================
-      function copyToClipboard(btn) {
-        const latexStr = btn.getAttribute("data-latex");
+      function copyToClipboard(text, btn) {
+        const el = document.createElement("textarea");
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
 
-        // iFrame 환경 제약을 우회하기 위한 텍스트 에어리어 폴백 방식 적용
-        const textArea = document.createElement("textarea");
-        textArea.value = latexStr;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-999999px";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-
-        try {
-          document.execCommand("copy");
-          // 복사 성공 시 버튼 UI 피드백
-          const originalText = btn.innerText;
-          btn.innerText = " ✓ ";
-          btn.classList.remove("bg-blue-600", "hover:bg-blue-500");
-          btn.classList.add("bg-green-600", "hover:bg-green-500");
-
-          setTimeout(() => {
-            btn.innerText = originalText;
-            btn.classList.remove("bg-green-600", "hover:bg-green-500");
-            btn.classList.add("bg-blue-600", "hover:bg-blue-500");
-          }, 2000);
-        } catch (err) {
-          console.error("Clipboard copy failed", err);
-          const originalText = btn.innerText;
-          btn.innerText = "❌ 실패";
-          btn.classList.remove("bg-blue-600", "hover:bg-blue-500");
-          btn.classList.add("bg-red-600", "hover:bg-red-500");
-
-          setTimeout(() => {
-            btn.innerText = originalText;
-            btn.classList.remove("bg-red-600", "hover:bg-red-500");
-            btn.classList.add("bg-blue-600", "hover:bg-blue-500");
-          }, 2000);
-        }
-
-        document.body.removeChild(textArea);
+        const original = btn.innerText;
+        btn.innerText = "복사됨!";
+        btn.classList.replace("bg-gray-700", "bg-green-600");
+        setTimeout(() => {
+          btn.innerText = original;
+          btn.classList.replace("bg-green-600", "bg-gray-700");
+        }, 1500);
       }
 
-      function matrixToHTML(title, matrix) {
-        // 붙여넣기 했을 때 가독성을 높이기 위해 줄바꿈(\n)을 포함한 LaTeX 생성
-        let latexRaw = `\\begin{bmatrix}\n`;
+      function renderMatrix(matrix, title) {
+        let latex = "\\begin{bmatrix}\n";
         for (let i = 0; i < 4; i++) {
           let row = [];
           for (let j = 0; j < 4; j++) {
-            let cellStr = polyToString(matrix[i][j]);
-            row.push(polyToLaTeX(cellStr));
+            row.push(polyToLaTeX(polyToString(matrix[i][j])));
           }
-          latexRaw += "  " + row.join(" & ") + (i < 3 ? ` \\\\\n` : `\n`);
+          latex += "  " + row.join(" & ") + (i === 3 ? "" : " \\\\") + "\n";
         }
-        latexRaw += `\\end{bmatrix}`;
+        latex += "\\end{bmatrix}";
 
-        let displayLatex = `$$ ${latexRaw} $$`;
-        // HTML 속성에 수식을 안전하게 넣기 위해 따옴표 이스케이프
-        let escapedLatex = displayLatex.replace(/"/g, "&quot;");
-
-        let html = `<div class="bg-gray-800 p-5 rounded-lg shadow-xl border border-gray-700 overflow-x-auto">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold text-yellow-300 whitespace-nowrap">${title}</h3>
-                            <button onclick="copyToClipboard(this)" data-latex="${escapedLatex}" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-3 py-1 rounded transition shadow font-bold">COPY</button>
-                        </div>`;
-        html += `<div class="text-xl text-gray-200 overflow-x-auto w-full flex justify-center py-4 cursor-text select-text">${displayLatex}</div></div>`;
-        return html;
+        const div = document.createElement("div");
+        div.className =
+          "bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700";
+        div.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-blue-300 font-bold font-mono">${title}</h3>
+                    <button onclick='copyToClipboard(\`${latex}\`, this)' class="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded transition">Copy LaTeX</button>
+                </div>
+                <div class="math-container overflow-x-auto py-4 flex justify-center text-lg">
+                    $$ ${latex} $$
+                </div>
+            `;
+        return div;
       }
 
-      function calculate() {
+      async function calculate() {
         const rows = document.querySelectorAll("#dh-body tr");
-        const outputDiv = document.getElementById("output");
+        const output = document.getElementById("output");
+        output.innerHTML = "";
 
-        if (rows.length === 0) {
-          outputDiv.innerHTML =
-            '<p class="text-red-400 text-lg">⚠️ 입력된 파라미터가 없습니다. 행을 추가해주세요.</p>';
-          return;
-        }
+        if (rows.length === 0) return;
 
         let matrices = [];
-        let htmlOutput = "";
-
         rows.forEach((row, i) => {
           const inputs = row.querySelectorAll("input");
-          let alpha = formatSymbol(inputs[0].value);
-          let a = formatSymbol(inputs[1].value);
-          let d = formatSymbol(inputs[2].value);
-          let theta = formatSymbol(inputs[3].value);
+          const al = formatSymbol(inputs[0].value || "0");
+          const a = formatSymbol(inputs[1].value || "0");
+          const d = formatSymbol(inputs[2].value || "0");
+          const th = formatSymbol(inputs[3].value || `θ${i + 1}`);
 
-          inputs[0].value = alpha;
+          inputs[0].value = al;
           inputs[1].value = a;
           inputs[2].value = d;
-          inputs[3].value = theta;
+          inputs[3].value = th;
 
-          let T = getSymbolicDHMatrix(
-            alpha || "0",
-            a || "0",
-            d || "0",
-            theta || "0",
-          );
+          const T = getDHMatrix(al, a, d, th);
           matrices.push(T);
-          htmlOutput += matrixToHTML(`\\( T_{${i + 1}} \\) (Link ${i + 1})`, T);
+          output.appendChild(renderMatrix(T, `^{${i}}T_{${i + 1}}`));
         });
 
-        if (matrices.length > 0) {
+        if (matrices.length > 1) {
           let T_total = matrices[0];
           for (let i = 1; i < matrices.length; i++) {
-            T_total = multiplySymbolicMatrices(T_total, matrices[i]);
+            T_total = multiply(T_total, matrices[i]);
           }
-
-          let equationName = Array.from(
-            { length: matrices.length },
-            (_, i) => `T_{${i + 1}}`,
-          ).join(" \\times ");
-          htmlOutput += `<div class="mt-12"></div>`;
-          htmlOutput += matrixToHTML(
-            `최종 변환 행렬 (\\( ${equationName} \\))`,
-            T_total,
-          );
+          const finalHeader = document.createElement("div");
+          finalHeader.className = "pt-8 pb-2 border-t border-gray-700 mt-12";
+          finalHeader.innerHTML = `<h2 class="text-2xl font-bold text-yellow-400 mb-4">최종 변환 행렬 (^{0}T_{${matrices.length}})</h2>`;
+          output.appendChild(finalHeader);
+          output.appendChild(renderMatrix(T_total, `Base to Tool (Final)`));
         }
 
-        outputDiv.innerHTML = htmlOutput;
-
-        // 추가된 수식들을 MathJax를 통해 비동기로 렌더링
-        if (window.MathJax && window.MathJax.typesetPromise) {
-          MathJax.typesetPromise([outputDiv]).catch((err) =>
-            console.error("MathJax error:", err.message),
-          );
-        } else {
-          setTimeout(() => {
-            if (window.MathJax && window.MathJax.typesetPromise) {
-              MathJax.typesetPromise([outputDiv]);
-            }
-          }, 300);
-        }
+        if (window.MathJax) MathJax.typesetPromise();
       }
 
       window.onload = () => {
-        // 처음 업로드 해주신 Standard DH 표의 값으로 기본 세팅
+        // 이미지의 상황을 재현하기 위한 샘플 데이터 (예: 음각이 섞인 케이스)
         addRow("pi/2", "l1", "0", "theta1");
-        addRow("0", "l2", "0", "theta2");
-        addRow("0", "l3", "0", "theta3");
+        addRow("0", "l2", "d2", "theta2");
+        addRow("-pi/2", "l3", "0", "theta3");
         calculate();
       };
     </script>
