@@ -20,6 +20,12 @@ tags:
 2. link 1. 직렬링크 $Z_1$축 ~ $Z_2$축
 3. End-Effector정의 1. 그리퍼
 
+<br />
+<br />
+<br />
+
+---
+
 ## DH parameter - standard
 
 ### DH Table
@@ -30,6 +36,10 @@ tags:
 | ------- | ---------------- | ------------------ | ------------ | ------- |
 | 1: 1~2  | -$\frac{\pi}{2}$ | $l_{1}Sin(\alpha)$ | $\theta^ʹ_1$ | 0       |
 | 2: 2~EE | 0                | 0                  | 0            | $d_2$   |
+
+<br />
+<br />
+<br />
 
 ### 일반식
 
@@ -59,6 +69,10 @@ $$
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
+
+<br />
+<br />
+<br />
 
 ### 변환행렬 도출
 
@@ -137,7 +151,13 @@ $$
 \end{bmatrix}
 $$
 
-## D-H Modified Way
+<br />
+<br />
+<br />
+
+---
+
+## DH parameter - Modified
 
 ### DH Table
 
@@ -147,6 +167,10 @@ $$
 | --- | ---------------- | --------------- | ------------ | ----- |
 | 1   | 0                | 0               | $\theta^ʹ_1$ | 0     |
 | 2   | $-\frac{\pi}{2}$ | $l_1\sin\alpha$ | 0            | $d_2$ |
+
+<br />
+<br />
+<br />
 
 ### 일반식
 
@@ -191,6 +215,10 @@ S{\theta_i}S{\alpha_{i-1}} & C{\theta_i}S{\alpha_{i-1}} & C{\alpha_{i-1}} & d_iC
  0 & 0 & 0 & 1
 \end{bmatrix}
 $$
+
+<br />
+<br />
+<br />
 
 ### 변환행렬 도출
 
@@ -250,6 +278,12 @@ $$
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
+
+<br />
+<br />
+<br />
+
+---
 
 ## kinematics 도출
 
