@@ -43,8 +43,7 @@ $$
 $$
 
 $$
-=
-\begin{bmatrix} C_{\theta_i} & -S_{\theta_i} & 0 & 0 \\ S_{\theta_i} & C_{\theta_i} & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1
+=\begin{bmatrix} C_{\theta_i} & -S_{\theta_i} & 0 & 0 \\ S_{\theta_i} & C_{\theta_i} & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1
 \end{bmatrix}
 \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & d_i \\ 0 & 0 & 0 & 1
 \end{bmatrix}
@@ -202,8 +201,6 @@ modified 와 standard는 table이 서로 다르다 - 어떻게 다른가 설명�
 | 1   | 0                | 0         | 0       | ${\theta_1}$ |
 | 2   | 0                | $l_1$     | 0       | ${\theta_2}$ |
 | EE  | 0                | $l_2$     | 0       | 0            |
-
-[설명-youtube](https://www.youtube.com/live/16F0ov3pGSo?si=1ymdPrMLQm4qvyoD)
 
 변수를 바탕으로 일반식을 도출하자
 
@@ -376,8 +373,7 @@ $$
 회전행렬과 최종위치를 도출 (3x3) (3x1)
 
 $$
-=
-\begin{bmatrix}
+=\begin{bmatrix}
 C{\theta_1}C{\theta_2}-S{\theta_1}S{\theta_2} &
 -(C{\theta_1}S{\theta_2}+C{\theta_1}S{\theta_2}) &
 0 &
