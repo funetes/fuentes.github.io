@@ -30,7 +30,7 @@ tags:
 
 | i       | $\alpha_{i}$     | $a_{i}$            | $\theta_{i}$ | $d_{i}$ |
 | ------- | ---------------- | ------------------ | ------------ | ------- |
-| 1: 1~2  | -$\frac{\pi}{2}$ | $l_{1}Sin(\alpha)$ | $\theta^`_1$ | 0       |
+| 1: 1~2  | -$\frac{\pi}{2}$ | $l_{1}Sin(\alpha)$ | $\theta^ʹ_1$ | 0       |
 | 2: 2~EE | 0                | 0                  | 0            | $d_2$   |
 
 2. 일반식
@@ -63,8 +63,8 @@ $$
 
 $$
 ^0_1T = \begin{bmatrix}
-\cos \theta^`_{i} & -\sin\theta^`_{i} \cos (-\frac{\pi}{2}) & \sin \theta^`_{i} \sin (-\frac{\pi}{2}) & a_{i} \cos \theta^`_{i} \\
-\sin \theta^`_{i} & \cos \theta^`_{i} \cos (-\frac{\pi}{2}) & -\cos \theta^`_{i} \sin (-\frac{\pi}{2}) & a_{i} \sin \theta^`_{i} \\
+\cos \theta^ʹ_{i} & -\sin\theta^ʹ_{i} \cos (-\frac{\pi}{2}) & \sin \theta^ʹ_{i} \sin (-\frac{\pi}{2}) & a_{i} \cos \theta^ʹ_{i} \\
+\sin \theta^ʹ_{i} & \cos \theta^ʹ_{i} \cos (-\frac{\pi}{2}) & -\cos \theta^ʹ_{i} \sin (-\frac{\pi}{2}) & a_{i} \sin \theta^ʹ_{i} \\
 0 & \sin (-\frac{\pi}{2}) & \cos (-\frac{\pi}{2}) & d_{i} \\
 0 & 0 & 0 & 1
 \end{bmatrix}
@@ -74,18 +74,18 @@ $\cos (-\frac{\pi}{2})$ = $0$, $\sin (-\frac{\pi}{2})$ = $-1$ 이므로,
 
 $$
 ^0_1T = \begin{bmatrix}
-\cos \theta^`_{i} & 0 & -\sin \theta^`_{i} & a_{i} \cos \theta^`_{i} \\
-\sin \theta^`_{i} & 0 & \cos \theta^`_{i} & a_{i} \sin \theta^`_{i} \\
+\cos \theta^ʹ_{i} & 0 & -\sin \theta^ʹ_{i} & a_{i} \cos \theta^ʹ_{i} \\
+\sin \theta^ʹ_{i} & 0 & \cos \theta^ʹ_{i} & a_{i} \sin \theta^ʹ_{i} \\
 0 & -1 & 0 & 0 \\
 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
 
-$\theta^`_i$ 는 $\theta_1$ + $\alpha$ - $\frac{\pi}{2}$ 로 나타낼수 있다,
+$\theta^ʹ_i$ 는 $\theta_1$ + $\alpha$ - $\frac{\pi}{2}$ 로 나타낼수 있다,
 
 cos( $\theta_1$ + $\alpha$ - $\frac{\pi}{2}$) , sin( $\theta_1$ + $\alpha$ - $\frac{\pi}{2}$) 을 [[덧셈정리]]를 이용하여 정리하면,
 
-cos$\theta^`_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^`_i$ = -cos($\theta_1$ + $\alpha$) 가 된다.
+cos$\theta^ʹ_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^ʹ_i$ = -cos($\theta_1$ + $\alpha$) 가 된다.
 
 정리하면 $^0_1T$ 는
 
@@ -112,8 +112,8 @@ $$
 $$
 ^0_1T^1_2T =
 \begin{bmatrix}
-\cos \theta^`_{i} & 0 & -\sin \theta^`_{i} & a_{i} \cos \theta^`_{i} \\
-\sin \theta^`_{i} & 0 & \cos \theta^`_{i} & a_{i} \sin \theta^`_{i} \\
+\cos \theta^ʹ_{i} & 0 & -\sin \theta^ʹ_{i} & a_{i} \cos \theta^ʹ_{i} \\
+\sin \theta^ʹ_{i} & 0 & \cos \theta^ʹ_{i} & a_{i} \sin \theta^ʹ_{i} \\
 0 & -1 & 0 & 0 \\
 0 & 0 & 0 & 1
 \end{bmatrix}
@@ -125,7 +125,7 @@ $$
 \end{bmatrix}
 $$
 
-cos$\theta^`_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^`_i$ = -cos($\theta_1$ + $\alpha$) 가 된다.
+cos$\theta^ʹ_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^ʹ_i$ = -cos($\theta_1$ + $\alpha$) 가 된다.
 
 $$
 = \begin{bmatrix}
@@ -136,14 +136,14 @@ $$
 \end{bmatrix}
 $$
 
-## D-H Modified Way
+## DH parameter - modified
 
 1. DH Table
    #Realize modified way는 0부터
 
 | i   | $\alpha_{i-1}$   | $a_{i-1}$       | $\theta_i$   | $d_i$ |
 | --- | ---------------- | --------------- | ------------ | ----- |
-| 1   | 0                | 0               | $\theta^`_1$ | 0     |
+| 1   | 0                | 0               | $\theta^ʹ_1$ | 0     |
 | 2   | $-\frac{\pi}{2}$ | $l_1\sin\alpha$ | 0            | $d_2$ |
 
 2. 일반식
@@ -193,14 +193,14 @@ $$
    $$
    ^0_1T=
    \begin{bmatrix}
-   C{\theta^`_1} & -S{\theta^`_1} & 0 & 0 \\
-   S{\theta^`_1} & C{\theta^`_1} & 0 & 0 \\
+   C{\theta^ʹ_1} & -S{\theta^ʹ_1} & 0 & 0 \\
+   S{\theta^ʹ_1} & C{\theta^ʹ_1} & 0 & 0 \\
    0 & 0 & 1 & 0 \\
    0 & 0 & 0 & 1 \\
    \end{bmatrix}
    $$
 
-cos$\theta^`_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^`_i$ = -cos($\theta_1$ + $\alpha$) 가 된다. [[덧셈정리]]
+cos$\theta^ʹ_i$ = sin($\theta_1$ + $\alpha$) , sin$\theta^ʹ_i$ = -cos($\theta_1$ + $\alpha$) 가 된다. [[덧셈정리]]
 
 $$
 ^0_1T=
@@ -277,9 +277,9 @@ $$
 
 ![Pasted image 20260420122232.png](/assets/images/Pasted-image-20260420122232.png)
 
-$\theta^`_i$ 는 $\theta_1$ 와 $\alpha$로 표현해서 변수를 줄인다.
+$\theta^ʹ_i$ 는 $\theta_1$ 와 $\alpha$로 표현해서 변수를 줄인다.
 
-$\theta^`_i$ = ($\theta_1$ + $\alpha$) - $\frac{\pi}{2}$ [[덧셈정리]] 를 이용해서 정리하면 됨.
+$\theta^ʹ_i$ = ($\theta_1$ + $\alpha$) - $\frac{\pi}{2}$ [[덧셈정리]] 를 이용해서 정리하면 됨.
 
 $d_2$ => z축 성분이 x , y 성분으로 분리됨.
 
