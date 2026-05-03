@@ -66,7 +66,6 @@ link parameter: $\alpha_{i}$ , $l_i$
 \*joint -> link 순서임
 
 변수를 구해야 한다. #yet
-[설명-youtube](https://www.youtube.com/live/X17US1jiguY?si=IABQ46oMqAU6A5q5&t=5037)
 
 | i   | ${\theta}_i$ | $d_i$ | $\alpha_{i}$ | $l_i$ |
 | --- | ------------ | ----- | ------------ | ----- |
