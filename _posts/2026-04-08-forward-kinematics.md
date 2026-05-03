@@ -36,23 +36,23 @@ tags:
 
 ![Pasted image 20260408104502.png](/assets/images/Pasted-image-20260408104502.png)
 
-## Prismatic Joint(2DOF)
+### Prismatic Joint(2DOF)
 
 ![스크린샷 2026-04-08 오전 10.48.00.png](/assets/images/스크린샷-2026-04-08-오전-10.48.00.png)
 
-## Cylindrial Joint(2DOF)
+### Cylindrial Joint(2DOF)
 
 ![스크린샷 2026-04-08 오전 10.49.00.png](/assets/images/스크린샷-2026-04-08-오전-10.49.00.png)
 
-## Spherical Joint(3DOF)
+### Spherical Joint(3DOF)
 
 ![스크린샷 2026-04-08 오전 10.55.35.png](/assets/images/스크린샷-2026-04-08-오전-10.55.35.png)
 
-## Planar Joint(3DOF)
+### Planar Joint(3DOF)
 
 ![스크린샷 2026-04-08 오전 10.56.07.png](/assets/images/스크린샷-2026-04-08-오전-10.56.07.png)
 
-## Screw Joint(1DOF)
+### Screw Joint(1DOF)
 
 ![스크린샷 2026-04-08 오전 11.00.02.png](/assets/images/스크린샷-2026-04-08-오전-11.00.02.png)
 
