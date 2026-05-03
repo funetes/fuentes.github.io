@@ -1,15 +1,12 @@
 ---
 layout: post
-title: "RR-manipulator"
+title: "RP-manipulator"
 date: 2026-04-24
 categories: robotics
 tags:
   - manipulator
   - kinematics
-  - RR-joint
 ---
-
-# RP Manipulator
 
 ![Pasted image 20260424114855.png](/assets/images/Pasted-image-20260424114855.png)
 ![스크린샷 2026-04-20 오후 3.21.27.png](/assets/images/스크린샷-2026-04-20-오후-3.21.27.png)
